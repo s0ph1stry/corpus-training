@@ -1,5 +1,5 @@
 {
-  "vocab_size": 16233,
+  "vocab_size": 16236,
   "special_tokens": [
     "<pad>",
     "<bos>",
@@ -253,5 +253,10 @@
   ],
   "complete_token": "<complete>",
   "complete_token_id": 16232,
-  "n_author_tokens": 232
+  "n_author_tokens": 232,
+  "mode_tokens": {
+    "<mode_r>": 16233,
+    "<mode_s>": 16234,
+    "<mode_x>": 16235
+  }
 }

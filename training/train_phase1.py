@@ -17,11 +17,8 @@ Usage:
 
 import argparse
 import json
-import random
 import sys
 from pathlib import Path
-
-import torch
 
 # Add project root to path
 PROJECT_DIR = Path(__file__).parent.parent
@@ -43,8 +40,6 @@ def main():
     parser.add_argument('--resume', type=str, default=None,
                         help="Checkpoint path or 'latest'")
     parser.add_argument('--no-wandb', action='store_true')
-    parser.add_argument('--collapse-mitigation-rate', type=float, default=0.10,
-                        help="Fraction of batches with forced encoder_available=False")
     args = parser.parse_args()
 
     # Config
@@ -108,7 +103,8 @@ def main():
     print(f"\nStarting Phase 1 training ({args.total_steps} steps)")
     print(f"  Batch size: {args.batch_size}")
     print(f"  LR: {args.lr}")
-    print(f"  Collapse mitigation: {args.collapse_mitigation_rate*100:.0f}% forced no-encoder")
+    print(f"  UL2 mode mixing: R=50% S=25% X=25%")
+    print(f"  (S-mode provides Type B gradient — no separate collapse mitigation needed)")
     print()
 
     dataset = loader.dataset
@@ -118,24 +114,15 @@ def main():
             if trainer.global_step >= args.total_steps:
                 break
 
-            # Router collapse mitigation: force some batches to no-encoder
-            is_mitigation_batch = random.random() < args.collapse_mitigation_rate
-            if is_mitigation_batch:
-                batch['encoder_available'] = torch.zeros_like(batch['encoder_available'])
-                batch['encoder_input_ids'] = None
-                batch['encoder_padding_mask'] = None
-
-            # Update dataset step for corruption schedule
+            # Update dataset step for corruption schedule + UL2 mode ratios
             dataset.set_step(trainer.global_step)
 
             # Train step
             result = trainer.train_step(batch)
 
-            # Online difficulty adjustment (skip mitigation batches — inflated loss
-            # would distort sampling weights)
-            if not is_mitigation_batch:
-                for name, loss in result['per_text_loss'].items():
-                    dataset.update_online_difficulty(name, loss)
+            # Online difficulty adjustment
+            for name, loss in result['per_text_loss'].items():
+                dataset.update_online_difficulty(name, loss)
 
             # Logging
             trainer.log(result)

@@ -148,6 +148,7 @@ class Trainer:
         self.running_loss = 0.0
         self.running_aux_loss = 0.0
         self.running_count = 0
+        self.running_ul2_modes = {'R': 0, 'S': 0, 'X': 0}
 
     def train_step(self, batch: dict) -> dict:
         """Single training step. Returns loss dict for logging."""
@@ -228,6 +229,12 @@ class Trainer:
         self.running_aux_loss += aux_loss.item()
         self.running_count += 1
 
+        # UL2 mode tracking
+        ul2_modes = batch.get('ul2_modes', [])
+        for mode in ul2_modes:
+            if mode in self.running_ul2_modes:
+                self.running_ul2_modes[mode] += 1
+
         return {
             'loss': task_loss.item(),
             'aux_loss': aux_loss.item(),
@@ -249,13 +256,18 @@ class Trainer:
         entropy_stats = self.model.moe_manager.get_routing_entropy()
         mean_entropy = sum(entropy_stats.values()) / max(len(entropy_stats), 1) if entropy_stats else 0.0
 
+        # UL2 mode distribution
+        ul2_total = sum(self.running_ul2_modes.values())
+        ul2_pcts = {k: v / max(ul2_total, 1) for k, v in self.running_ul2_modes.items()}
+
         # Console
         print(f"  step {self.global_step:>6d} | "
               f"loss {avg_loss:.4f} | "
               f"aux {avg_aux:.4f} | "
               f"lr {step_result['lr']:.2e} | "
               f"grad {step_result['grad_norm']:.2f} | "
-              f"ent {mean_entropy:.3f}")
+              f"ent {mean_entropy:.3f} | "
+              f"R:{ul2_pcts['R']:.0%} S:{ul2_pcts['S']:.0%} X:{ul2_pcts['X']:.0%}")
 
         # wandb
         if self.use_wandb:
@@ -270,11 +282,16 @@ class Trainer:
             # Add per-layer routing entropy (Grok patch)
             entropy_stats = self.model.moe_manager.get_routing_entropy()
             log_dict.update(entropy_stats)
+            # UL2 mode distribution
+            log_dict['ul2/R'] = ul2_pcts['R']
+            log_dict['ul2/S'] = ul2_pcts['S']
+            log_dict['ul2/X'] = ul2_pcts['X']
             wandb.log(log_dict, step=self.global_step)
 
         self.running_loss = 0.0
         self.running_aux_loss = 0.0
         self.running_count = 0
+        self.running_ul2_modes = {'R': 0, 'S': 0, 'X': 0}
 
     def save_checkpoint(self, extra: dict = None):
         """Save model checkpoint. Also checks for routing collapse."""

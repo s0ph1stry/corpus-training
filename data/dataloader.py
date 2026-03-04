@@ -79,6 +79,9 @@ class MixedBatchCollator:
         decoder_padding_mask = decoder_input_ids != self.pad_id
         encoder_padding_mask = encoder_input_ids != self.pad_id
 
+        # Collect UL2 mode info if available
+        ul2_modes = [sample.get('ul2_mode', '') for sample in batch]
+
         return {
             'decoder_input_ids': decoder_input_ids,
             'decoder_targets': decoder_targets,
@@ -87,6 +90,7 @@ class MixedBatchCollator:
             'decoder_padding_mask': decoder_padding_mask,
             'encoder_padding_mask': encoder_padding_mask if has_encoder else None,
             'text_names': text_names,
+            'ul2_modes': ul2_modes,
         }
 
 

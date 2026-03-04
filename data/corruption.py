@@ -1,21 +1,25 @@
 """
-Corruption strategies for the denoising pretraining objective (Phase 1).
+Corruption strategies for denoising pretraining.
 
-Pure functions, independently testable. Each takes token IDs and returns
-corrupted token IDs + targets. No model dependencies.
+UL2-style mixture of denoisers with three modes:
+  - R-denoiser (Regular): short spans, low corruption (15-30%). Local patterns.
+  - S-denoiser (Sequential): causal prefix-to-suffix. Autoregressive generation.
+  - X-denoiser (eXtreme): long spans, high corruption (50-80%). Deep reconstruction.
 
-Strategies:
-  - span_mask: T5-style span masking, replace spans with <mask>
+Each mode gets a mode token (<mode_r>, <mode_s>, <mode_x>) prepended to the
+sequence, giving the router an explicit signal about what kind of task this is.
+
+Corruption strategies (used within R and X modes):
+  - span_mask: in-place per-token <mask> replacement (length-preserving)
   - sentence_shuffle: detect sentence boundaries, shuffle order
-  - span_deletion: like span_mask but mask token omitted (harder)
+  - span_deletion: random token noise injection (harder, no <mask> indicator)
   - cross_text_insert: insert spans from a different text, wrapped in <corrupt>
   - semantic_corrupt: antonym/synonym substitution via lookup table
-
-Progressive corruption schedule: linear from 0.15 to 0.80 over training.
 """
 
 import random
 import re
+from dataclasses import dataclass
 from typing import List, Tuple, Optional, Dict
 
 
@@ -26,11 +30,26 @@ CORRUPT_END_ID = None
 BOS_ID = None
 EOS_ID = None
 PAD_ID = None
+MODE_R_ID = None
+MODE_S_ID = None
+MODE_X_ID = None
+
+
+@dataclass
+class UL2Mode:
+    """UL2 denoiser mode configuration."""
+    name: str          # 'R', 'S', or 'X'
+    token_id: int      # mode token to prepend
+    encoder_available: bool  # whether encoder is used
+    corruption_rate_range: Tuple[float, float]  # (min_rate, max_rate)
+    avg_span_length: int     # mean span length for masking
+    strategies: List[str]    # which corruption strategies to use
 
 
 def init_special_tokens(tokenizer):
     """Initialize special token IDs from a loaded tokenizer."""
     global MASK_ID, CORRUPT_START_ID, CORRUPT_END_ID, BOS_ID, EOS_ID, PAD_ID
+    global MODE_R_ID, MODE_S_ID, MODE_X_ID
     MASK_ID = tokenizer.token_to_id("<mask>")
     CORRUPT_START_ID = tokenizer.token_to_id("<corrupt>")
     # <corrupt> is used for both start and end markers
@@ -38,6 +57,9 @@ def init_special_tokens(tokenizer):
     BOS_ID = tokenizer.token_to_id("<bos>")
     EOS_ID = tokenizer.token_to_id("<eos>")
     PAD_ID = tokenizer.token_to_id("<pad>")
+    MODE_R_ID = tokenizer.token_to_id("<mode_r>")
+    MODE_S_ID = tokenizer.token_to_id("<mode_s>")
+    MODE_X_ID = tokenizer.token_to_id("<mode_x>")
 
 
 def corruption_rate(step: int, total_steps: int,
@@ -415,6 +437,100 @@ def sample_strategy(step: int, total_steps: int) -> str:
             'span_deletion': 0.35,
         }
 
+    strategies = list(weights.keys())
+    probs = list(weights.values())
+    return random.choices(strategies, weights=probs, k=1)[0]
+
+
+# ============================================================================
+# UL2 Mixture of Denoisers
+# ============================================================================
+
+# Default mode ratios (from UL2 paper, adapted for our architecture)
+DEFAULT_MODE_RATIOS = {
+    'R': 0.50,  # Regular: short spans, low corruption. Local patterns.
+    'S': 0.25,  # Sequential: autoregressive, no encoder. Type B training.
+    'X': 0.25,  # eXtreme: high corruption, long spans. Heavy encoder use.
+}
+
+# Phase 2 ratios: shift toward generation
+PHASE2_MODE_RATIOS = {
+    'R': 0.15,  # Maintenance denoising
+    'S': 0.70,  # Mostly autoregressive generation
+    'X': 0.15,  # Some extreme denoising
+}
+
+
+def sample_ul2_mode(step: int, total_steps: int,
+                    phase: str = 'phase1') -> str:
+    """Sample a UL2 denoiser mode (R, S, or X).
+
+    Phase 1: Heavy R/X denoising with S-mode for Type B gradient.
+    Phase 2: Heavy S-mode generation with R/X maintenance denoising.
+    """
+    if phase == 'phase2':
+        ratios = PHASE2_MODE_RATIOS
+    else:
+        ratios = DEFAULT_MODE_RATIOS
+
+    modes = list(ratios.keys())
+    weights = list(ratios.values())
+    return random.choices(modes, weights=weights, k=1)[0]
+
+
+def get_ul2_corruption_config(mode: str, step: int, total_steps: int) -> dict:
+    """Get corruption parameters for a UL2 mode.
+
+    R-mode: short spans, low corruption (15-30%), common strategies
+    X-mode: long spans, high corruption (50-80%), harder strategies
+    S-mode: no corruption (autoregressive)
+    """
+    progress = min(step / max(total_steps, 1), 1.0)
+
+    if mode == 'R':
+        # Regular denoising: short spans, moderate corruption
+        rate = 0.15 + 0.15 * progress  # 15% → 30%
+        return {
+            'mode_token_id': MODE_R_ID,
+            'encoder_available': True,
+            'corruption_rate': rate,
+            'avg_span_length': 3,
+            'strategy_weights': {
+                'span_mask': 0.6,
+                'sentence_shuffle': 0.2,
+                'semantic_corrupt': 0.2,
+            },
+        }
+    elif mode == 'X':
+        # Extreme denoising: long spans, heavy corruption
+        rate = 0.50 + 0.30 * progress  # 50% → 80%
+        return {
+            'mode_token_id': MODE_X_ID,
+            'encoder_available': True,
+            'corruption_rate': rate,
+            'avg_span_length': 8,
+            'strategy_weights': {
+                'span_mask': 0.3,
+                'span_deletion': 0.4,  # noise injection, harder
+                'cross_text_insert': 0.3,
+            },
+        }
+    else:  # S-mode
+        # Sequential: no corruption, autoregressive
+        return {
+            'mode_token_id': MODE_S_ID,
+            'encoder_available': False,
+            'corruption_rate': 0.0,
+            'avg_span_length': 0,
+            'strategy_weights': {},
+        }
+
+
+def sample_strategy_for_mode(mode_config: dict) -> Optional[str]:
+    """Sample a corruption strategy based on mode config weights."""
+    weights = mode_config['strategy_weights']
+    if not weights:
+        return None
     strategies = list(weights.keys())
     probs = list(weights.values())
     return random.choices(strategies, weights=probs, k=1)[0]

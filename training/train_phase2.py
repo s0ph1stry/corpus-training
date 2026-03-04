@@ -96,7 +96,7 @@ def main():
 
     # Training loop
     print(f"\nStarting Phase 2 training ({args.total_steps} steps)")
-    print(f"  Denoise ratio: {args.denoise_ratio*100:.0f}%")
+    print(f"  UL2 mode mixing: R=15% S=70% X=15%")
     print(f"  LR: {args.lr}")
     print()
 

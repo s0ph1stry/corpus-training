@@ -26,7 +26,8 @@ from tokenizers import Tokenizer
 
 from data.corruption import (
     init_special_tokens, corruption_rate, sample_strategy,
-    apply_corruption,
+    apply_corruption, sample_ul2_mode, get_ul2_corruption_config,
+    sample_strategy_for_mode,
 )
 
 
@@ -320,72 +321,158 @@ class CorpusDataset(Dataset):
         else:
             raise ValueError(f"Unknown mode: {self.mode}")
 
+    @property
+    def phase(self) -> str:
+        """Extract phase name from mode string."""
+        return self.mode.split('_')[0]
+
     def _get_denoise_sample(self) -> dict:
-        """Phase 1: denoising sample with encoder input and decoder target."""
+        """UL2-style denoising sample. Samples R/S/X mode, prepends mode token.
+
+        R-mode: short spans, low corruption → encoder_available=True
+        S-mode: autoregressive, no corruption → encoder_available=False
+        X-mode: high corruption, long spans → encoder_available=True
+        """
+        # Sample UL2 mode
+        mode = sample_ul2_mode(self._current_step, self.total_steps,
+                               phase=self.mode.split('_')[0])
+        mode_config = get_ul2_corruption_config(
+            mode, self._current_step, self.total_steps
+        )
+
         text = self._sample_text()
 
-        # Reserve space for author token + BOS
-        max_content = self.context_len - 2
+        # Reserve space for mode token + author token
+        max_content = self.context_len - 3
         window = self._extract_window(text['token_ids'], max_content)
 
         # Prepend author token if available
         if text['author_token_id'] is not None:
             window = [text['author_token_id']] + window
 
-        # Corruption
-        rate = corruption_rate(self._current_step, self.total_steps)
-        strategy = sample_strategy(self._current_step, self.total_steps)
+        if mode == 'S':
+            # S-mode: autoregressive generation, no corruption
+            # Prepend mode token, then standard next-token prediction
+            window = [mode_config['mode_token_id']] + window
+            input_ids = window[:-1]
+            target_ids = window[1:]
 
-        donor_ids = None
-        if strategy == 'cross_text_insert':
-            donor_ids = self._get_donor_text(text['name'])
+            input_ids = self._pad_or_truncate(input_ids, self.context_len)
+            target_ids = self._pad_or_truncate(target_ids, self.context_len)
 
-        result = apply_corruption(
-            window, strategy, rate,
-            tokenizer=self.tokenizer,
-            donor_ids=donor_ids,
-        )
+            return {
+                'input_ids': torch.tensor(input_ids, dtype=torch.long),
+                'target_ids': torch.tensor(target_ids, dtype=torch.long),
+                'encoder_available': torch.tensor(0.0),
+                'text_name': text['name'],
+                'ul2_mode': mode,
+            }
+        else:
+            # R or X mode: corruption + reconstruction
+            strategy = sample_strategy_for_mode(mode_config)
+            rate = mode_config['corruption_rate']
 
-        corrupted = result['corrupted_ids']
+            donor_ids = None
+            if strategy == 'cross_text_insert':
+                donor_ids = self._get_donor_text(text['name'])
 
-        # Pad/truncate to context_len
-        encoder_input = self._pad_or_truncate(corrupted, self.context_len)
-        decoder_target = self._pad_or_truncate(window, self.context_len)
+            result = apply_corruption(
+                window, strategy, rate,
+                tokenizer=self.tokenizer,
+                donor_ids=donor_ids,
+            )
 
-        return {
-            'encoder_input': torch.tensor(encoder_input, dtype=torch.long),
-            'decoder_target': torch.tensor(decoder_target, dtype=torch.long),
-            'encoder_available': torch.tensor(1.0),
-            'text_name': text['name'],
-        }
+            corrupted = result['corrupted_ids']
+
+            # Prepend mode token to both corrupted and clean
+            corrupted = [mode_config['mode_token_id']] + corrupted
+            clean = [mode_config['mode_token_id']] + window
+
+            # Pad/truncate to context_len
+            encoder_input = self._pad_or_truncate(corrupted, self.context_len)
+            decoder_target = self._pad_or_truncate(clean, self.context_len)
+
+            return {
+                'encoder_input': torch.tensor(encoder_input, dtype=torch.long),
+                'decoder_target': torch.tensor(decoder_target, dtype=torch.long),
+                'encoder_available': torch.tensor(1.0),
+                'text_name': text['name'],
+                'ul2_mode': mode,
+            }
 
     def _get_generate_sample(self) -> dict:
-        """Phase 2: autoregressive generation sample."""
+        """Phase 2: autoregressive generation sample with UL2 mode mixing.
+
+        Samples UL2 mode — mostly S-mode (generation) with some R/X
+        maintenance denoising to keep the encoder pathway alive.
+        """
+        # In Phase 2, UL2 mode sampling shifts toward S-mode
+        mode = sample_ul2_mode(self._current_step, self.total_steps,
+                               phase='phase2')
+        mode_config = get_ul2_corruption_config(
+            mode, self._current_step, self.total_steps
+        )
+
         text = self._sample_text()
 
-        max_content = self.context_len - 2
-        window = self._extract_window(text['token_ids'], max_content)
+        if mode == 'S':
+            # S-mode: autoregressive generation
+            max_content = self.context_len - 3
+            window = self._extract_window(text['token_ids'], max_content)
 
-        # Prepend author token
-        if text['author_token_id'] is not None:
-            window = [text['author_token_id']] + window
+            if text['author_token_id'] is not None:
+                window = [text['author_token_id']] + window
 
-        # Add BOS at start
-        window = [self.bos_id] + window
+            window = [mode_config['mode_token_id']] + window
 
-        # Input is all but last, target is all but first (teacher forcing)
-        input_ids = window[:-1]
-        target_ids = window[1:]
+            input_ids = window[:-1]
+            target_ids = window[1:]
 
-        input_ids = self._pad_or_truncate(input_ids, self.context_len)
-        target_ids = self._pad_or_truncate(target_ids, self.context_len)
+            input_ids = self._pad_or_truncate(input_ids, self.context_len)
+            target_ids = self._pad_or_truncate(target_ids, self.context_len)
 
-        return {
-            'input_ids': torch.tensor(input_ids, dtype=torch.long),
-            'target_ids': torch.tensor(target_ids, dtype=torch.long),
-            'encoder_available': torch.tensor(0.0),
-            'text_name': text['name'],
-        }
+            return {
+                'input_ids': torch.tensor(input_ids, dtype=torch.long),
+                'target_ids': torch.tensor(target_ids, dtype=torch.long),
+                'encoder_available': torch.tensor(0.0),
+                'text_name': text['name'],
+                'ul2_mode': mode,
+            }
+        else:
+            # R or X mode: denoising maintenance in Phase 2
+            max_content = self.context_len - 3
+            window = self._extract_window(text['token_ids'], max_content)
+
+            if text['author_token_id'] is not None:
+                window = [text['author_token_id']] + window
+
+            strategy = sample_strategy_for_mode(mode_config)
+            rate = mode_config['corruption_rate']
+
+            donor_ids = None
+            if strategy == 'cross_text_insert':
+                donor_ids = self._get_donor_text(text['name'])
+
+            result = apply_corruption(
+                window, strategy, rate,
+                tokenizer=self.tokenizer,
+                donor_ids=donor_ids,
+            )
+
+            corrupted = result['corrupted_ids']
+            corrupted = [mode_config['mode_token_id']] + corrupted
+            clean = [mode_config['mode_token_id']] + window
+
+            encoder_input = self._pad_or_truncate(corrupted, self.context_len)
+            decoder_target = self._pad_or_truncate(clean, self.context_len)
+
+            return {
+                'encoder_input': torch.tensor(encoder_input, dtype=torch.long),
+                'decoder_target': torch.tensor(decoder_target, dtype=torch.long),
+                'encoder_available': torch.tensor(1.0),
+                'text_name': text['name'],
+                'ul2_mode': mode,
+            }
 
     def _pad_or_truncate(self, ids: List[int], length: int) -> List[int]:
         """Pad with pad_id or truncate to exact length."""
