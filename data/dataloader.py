@@ -62,9 +62,10 @@ class MixedBatchCollator:
 
                 encoder_input_ids[i, :len(enc_input)] = enc_input[:self.context_len]
 
-                # For denoising: decoder input = corrupted, target = original
-                # The decoder tries to reconstruct from the corrupted encoder input
-                decoder_input_ids[i, :len(dec_target)] = dec_target[:self.context_len]
+                # Decoder input = corrupted text (same as encoder input)
+                # Decoder target = clean original
+                # The model must use the encoder to reconstruct what was corrupted
+                decoder_input_ids[i, :len(enc_input)] = enc_input[:self.context_len]
                 decoder_targets[i, :len(dec_target)] = dec_target[:self.context_len]
             else:
                 # Generative sample
