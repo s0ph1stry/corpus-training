@@ -139,12 +139,25 @@ class MoELayer(nn.Module):
             expert_type = self.expert_types[expert_idx]
 
             if expert_type == 'A' and encoder_out is not None:
+                # Process cross-attention per batch element to avoid
+                # duplicating encoder_out for every token (VRAM optimization).
+                # Instead of gathering (N, enc_S, D) which copies encoder for
+                # every token, we loop over batch elements and share encoder KV.
                 batch_indices = all_positions // S
-                per_token_enc = encoder_out[batch_indices]
-                per_token_enc_mask = None
-                if encoder_mask is not None:
-                    per_token_enc_mask = encoder_mask[batch_indices]
-                out = expert(tokens, per_token_enc, per_token_enc_mask)
+                unique_batches = batch_indices.unique()
+                out = torch.zeros_like(tokens)
+                for b_idx in unique_batches:
+                    mask = batch_indices == b_idx
+                    b_tokens = tokens[mask]  # (n_b, D)
+                    # Single encoder output repeated for tokens from this batch element.
+                    # repeat() copies memory (expand() breaks MPS Metal stride checks)
+                    # but the per-batch-element loop keeps each copy small.
+                    n_b = mask.sum()
+                    b_enc = encoder_out[b_idx:b_idx+1].repeat(n_b, 1, 1)
+                    b_enc_mask = None
+                    if encoder_mask is not None:
+                        b_enc_mask = encoder_mask[b_idx:b_idx+1].repeat(n_b, 1)
+                    out[mask] = expert(b_tokens, b_enc, b_enc_mask)
             else:
                 out = expert(tokens)
 
