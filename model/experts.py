@@ -275,6 +275,7 @@ class MOEManager:
         self.balance_losses = []
         self.z_losses = []
         self.layer_entropies = []
+        self.layer_expert_fracs = []  # per-layer expert activation fractions
 
     def get_ramped_alpha(self, global_step: int) -> float:
         """Linear ramp from alpha_start to alpha_end over ramp_steps."""
@@ -310,6 +311,9 @@ class MOEManager:
         entropy = -(probs * (probs + 1e-10).log()).sum(dim=-1).mean()
         self.layer_entropies.append(entropy.item())
 
+        # Track per-expert activation fractions
+        self.layer_expert_fracs.append(f.detach().cpu().tolist())
+
     def add_z_loss(self, router_logits: torch.Tensor):
         """Router z-loss: penalizes large logits to prevent router collapse.
 
@@ -341,6 +345,17 @@ class MOEManager:
         """Return per-layer routing entropy from the last forward pass."""
         return {f'routing_entropy/layer_{i}': e
                 for i, e in enumerate(self.layer_entropies)}
+
+    def get_expert_fracs(self) -> dict:
+        """Return per-layer, per-expert activation fractions from the last forward pass.
+
+        Keys like 'expert_frac/layer_0/expert_0', values are fraction of tokens routed there.
+        """
+        result = {}
+        for layer_i, fracs in enumerate(self.layer_expert_fracs):
+            for expert_j, f in enumerate(fracs):
+                result[f'expert_frac/layer_{layer_i}/expert_{expert_j}'] = f
+        return result
 
     def check_collapse(self, threshold: float = 0.4, window: int = 3) -> bool:
         """Check if routing entropy has been below threshold for window checkpoints.

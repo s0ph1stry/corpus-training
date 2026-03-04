@@ -282,6 +282,9 @@ class Trainer:
             # Add per-layer routing entropy (Grok patch)
             entropy_stats = self.model.moe_manager.get_routing_entropy()
             log_dict.update(entropy_stats)
+            # Per-expert activation fractions
+            expert_fracs = self.model.moe_manager.get_expert_fracs()
+            log_dict.update(expert_fracs)
             # UL2 mode distribution
             log_dict['ul2/R'] = ul2_pcts['R']
             log_dict['ul2/S'] = ul2_pcts['S']
