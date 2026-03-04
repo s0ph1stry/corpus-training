@@ -155,11 +155,12 @@ class MoELayer(nn.Module):
                     b_enc_mask = None
                     if encoder_mask is not None:
                         b_enc_mask = encoder_mask[b_idx:b_idx+1].repeat(n_b, 1)
-                    out[mask] = expert(b_tokens, b_enc, b_enc_mask)
+                    out[mask] = expert(b_tokens, b_enc, b_enc_mask).to(out.dtype)
             else:
                 out = expert(tokens)
 
-            expert_output.index_add_(0, all_positions, weights * out)
+            # Match dtype for AMP compatibility (experts may return float32 under autocast)
+            expert_output.index_add_(0, all_positions, (weights * out).to(expert_output.dtype))
 
         # 6. Reshape and add residual
         expert_output = expert_output.view(B, S, D)
