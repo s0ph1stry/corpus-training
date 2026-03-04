@@ -229,12 +229,17 @@ class Trainer:
         avg_loss = self.running_loss / max(self.running_count, 1)
         avg_aux = self.running_aux_loss / max(self.running_count, 1)
 
+        # Routing entropy for console
+        entropy_stats = self.model.moe_manager.get_routing_entropy()
+        mean_entropy = sum(entropy_stats.values()) / max(len(entropy_stats), 1) if entropy_stats else 0.0
+
         # Console
         print(f"  step {self.global_step:>6d} | "
               f"loss {avg_loss:.4f} | "
               f"aux {avg_aux:.4f} | "
               f"lr {step_result['lr']:.2e} | "
-              f"grad {step_result['grad_norm']:.2f}")
+              f"grad {step_result['grad_norm']:.2f} | "
+              f"ent {mean_entropy:.3f}")
 
         # wandb
         if self.use_wandb:
