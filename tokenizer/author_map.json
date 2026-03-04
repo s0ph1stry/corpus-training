@@ -1,0 +1,866 @@
+{
+  "1001 Nights (selected)": {
+    "token": "<author_anonymous>",
+    "token_id": 16228
+  },
+  "Charles Dickens - A Christmas Carol": {
+    "token": "<author_Dickens>",
+    "token_id": 16056
+  },
+  "Claude Shannon - A Mathematical Theory of Communication (1948)": {
+    "token": "<author_Shannon>",
+    "token_id": 16180
+  },
+  "James Clerk Maxwell - A Treatise on Electricity and Magnetism": {
+    "token": "<author_Maxwell>",
+    "token_id": 16136
+  },
+  "Mary Wollstonecraft - A Vindication of the Rights of Woman": {
+    "token": "<author_Wollstonecraft>",
+    "token_id": 16221
+  },
+  "Virgil - Aeneid": {
+    "token": "<author_Virgil>",
+    "token_id": 16207
+  },
+  "Aesop - Aesop's Fables": {
+    "token": "<author_Aesop>",
+    "token_id": 16003
+  },
+  "Lewis Carroll - Alice's Adventures in Wonderland Through the Looking-Glass": {
+    "token": "<author_Carroll>",
+    "token_id": 16036
+  },
+  "David Hume - An Enquiry Concerning Human Understanding": {
+    "token": "<author_Hume>",
+    "token_id": 16105
+  },
+  "Leo Tolstoy - Anna Karenina": {
+    "token": "<author_Tolstoy>",
+    "token_id": 16201
+  },
+  "Plato - Apology Phaedo Republic Symposium Meno Gorgias Theaetetus": {
+    "token": "<author_Plato>",
+    "token_id": 16164
+  },
+  "John Milton - Areopagitica": {
+    "token": "<author_Milton>",
+    "token_id": 16141
+  },
+  "Beowulf (Old English)": {
+    "token": "<author_anonymous>",
+    "token_id": 16228
+  },
+  "Friedrich Nietzsche - Beyond Good and Evil": {
+    "token": "<author_Nietzsche>",
+    "token_id": 16153
+  },
+  "Bhagavad Gita": {
+    "token": "<author_anonymous>",
+    "token_id": 16228
+  },
+  "Herman Melville - Billy Budd": {
+    "token": "<author_Melville>",
+    "token_id": 16137
+  },
+  "Voltaire - Candide": {
+    "token": "<author_Voltaire>",
+    "token_id": 16209
+  },
+  "Henry David Thoreau - Civil Disobedience Walden": {
+    "token": "<author_Thoreau>",
+    "token_id": 16198
+  },
+  "Thomas Paine - Common Sense": {
+    "token": "<author_Paine>",
+    "token_id": 16159
+  },
+  "Emily Dickinson - Complete Poems": {
+    "token": "<author_Dickinson>",
+    "token_id": 16057
+  },
+  "Wassily Kandinsky - Concerning the Spiritual in Art": {
+    "token": "<author_Kandinsky>",
+    "token_id": 16114
+  },
+  "Augustine - Confessions": {
+    "token": "<author_Augustine>",
+    "token_id": 16011
+  },
+  "Fyodor Dostoevsky - Crime and Punishment": {
+    "token": "<author_Dostoevsky>",
+    "token_id": 16060
+  },
+  "Immanuel Kant - Critique of Pure Reason (selections)": {
+    "token": "<author_Kant>",
+    "token_id": 16115
+  },
+  "Alexis de Tocqueville - Democracy in America (selections)": {
+    "token": "<author_Tocqueville>",
+    "token_id": 16200
+  },
+  "Fyodor Dostoevsky - Demons (The Possessed)": {
+    "token": "<author_Dostoevsky>",
+    "token_id": 16060
+  },
+  "Dhammapada": {
+    "token": "<author_anonymous>",
+    "token_id": 16228
+  },
+  "Dante - Divine Comedy": {
+    "token": "<author_Dante>",
+    "token_id": 16052
+  },
+  "Miguel de Cervantes - Don Quixote": {
+    "token": "<author_Cervantes>",
+    "token_id": 16040
+  },
+  "James Joyce - Dubliners": {
+    "token": "<author_Joyce>",
+    "token_id": 16110
+  },
+  "Friedrich Nietzsche - Ecce Homo": {
+    "token": "<author_Nietzsche>",
+    "token_id": 16153
+  },
+  "Michel de Montaigne - Essays": {
+    "token": "<author_Montaigne>",
+    "token_id": 16143
+  },
+  "Edwin Abbott - Flatland": {
+    "token": "<author_Abbott>",
+    "token_id": 16000
+  },
+  "Mary Shelley - Frankenstein": {
+    "token": "<author_Shelley>",
+    "token_id": 16182
+  },
+  "Brothers Grimm - Grimm's Fairy Tales": {
+    "token": "<author_Grimm>",
+    "token_id": 16089
+  },
+  "Jonathan Swift - Gulliver's Travels": {
+    "token": "<author_Swift>",
+    "token_id": 16193
+  },
+  "Shakespeare - Hamlet": {
+    "token": "<author_Shakespeare>",
+    "token_id": 16179
+  },
+  "Joseph Conrad - Heart of Darkness": {
+    "token": "<author_Conrad>",
+    "token_id": 16049
+  },
+  "Herodotus - Histories (selections)": {
+    "token": "<author_Herodotus>",
+    "token_id": 16097
+  },
+  "Thucydides - History of the Peloponnesian War": {
+    "token": "<author_Thucydides>",
+    "token_id": 16199
+  },
+  "Charlotte Brontë - Jane Eyre": {
+    "token": "<author_Bront>",
+    "token_id": 16029
+  },
+  "Elias Lönnrot (compiled) - Kalevala": {
+    "token": "<author_compiled>",
+    "token_id": 16229
+  },
+  "Shakespeare - King Lear": {
+    "token": "<author_Shakespeare>",
+    "token_id": 16179
+  },
+  "Walt Whitman - Leaves of Grass (1855 edition)": {
+    "token": "<author_Whitman>",
+    "token_id": 16217
+  },
+  "John Keats - Letters": {
+    "token": "<author_Keats>",
+    "token_id": 16116
+  },
+  "Rainer Maria Rilke - Letters to a Young Poet": {
+    "token": "<author_Rilke>",
+    "token_id": 16169
+  },
+  "Thomas Hobbes - Leviathan (selections)": {
+    "token": "<author_Hobbes>",
+    "token_id": 16099
+  },
+  "Shakespeare - Macbeth": {
+    "token": "<author_Shakespeare>",
+    "token_id": 16179
+  },
+  "Marcus Aurelius - Meditations": {
+    "token": "<author_Aurelius>",
+    "token_id": 16012
+  },
+  "René Descartes - Meditations on First Philosophy": {
+    "token": "<author_Descartes>",
+    "token_id": 16055
+  },
+  "Ovid - Metamorphoses": {
+    "token": "<author_Ovid>",
+    "token_id": 16158
+  },
+  "Franz Kafka - Metamorphosis": {
+    "token": "<author_Kafka>",
+    "token_id": 16113
+  },
+  "George Eliot - Middlemarch": {
+    "token": "<author_Eliot>",
+    "token_id": 16066
+  },
+  "Herman Melville - Moby-Dick": {
+    "token": "<author_Melville>",
+    "token_id": 16137
+  },
+  "Frederick Douglass - Narrative of the Life of Frederick Douglass": {
+    "token": "<author_Douglass>",
+    "token_id": 16061
+  },
+  "Aristotle - Nicomachean Ethics": {
+    "token": "<author_Aristotle>",
+    "token_id": 16010
+  },
+  "Fyodor Dostoevsky - Notes from Underground": {
+    "token": "<author_Dostoevsky>",
+    "token_id": 16060
+  },
+  "D'Arcy Wentworth Thompson - On Growth and Form (1917)": {
+    "token": "<author_Thompson>",
+    "token_id": 16197
+  },
+  "John Stuart Mill - On Liberty": {
+    "token": "<author_Mill>",
+    "token_id": 16139
+  },
+  "Friedrich Nietzsche - On the Genealogy of Morality": {
+    "token": "<author_Nietzsche>",
+    "token_id": 16153
+  },
+  "Charles Darwin - On the Origin of Species (1859)": {
+    "token": "<author_Darwin>",
+    "token_id": 16053
+  },
+  "Shakespeare - Othello": {
+    "token": "<author_Shakespeare>",
+    "token_id": 16179
+  },
+  "John Milton - Paradise Lost": {
+    "token": "<author_Milton>",
+    "token_id": 16141
+  },
+  "Blaise Pascal - Pensées": {
+    "token": "<author_Pascal>",
+    "token_id": 16162
+  },
+  "Jane Austen - Persuasion": {
+    "token": "<author_Austen>",
+    "token_id": 16013
+  },
+  "Aristotle - Poetics": {
+    "token": "<author_Aristotle>",
+    "token_id": 16010
+  },
+  "Jane Austen - Pride and Prejudice": {
+    "token": "<author_Austen>",
+    "token_id": 16013
+  },
+  "Juvenal - Satires": {
+    "token": "<author_Juvenal>",
+    "token_id": 16112
+  },
+  "Ralph Waldo Emerson - Self-Reliance Experience": {
+    "token": "<author_Emerson>",
+    "token_id": 16067
+  },
+  "Hermann Hesse - Siddhartha": {
+    "token": "<author_Hesse>",
+    "token_id": 16098
+  },
+  "Sir Gawain and the Green Knight (Middle English)": {
+    "token": "<author_anonymous>",
+    "token_id": 16228
+  },
+  "Shakespeare - Sonnets": {
+    "token": "<author_Shakespeare>",
+    "token_id": 16179
+  },
+  "R.L. Stevenson - Strange Case of Dr Jekyll and Mr Hyde": {
+    "token": "<author_Stevenson>",
+    "token_id": 16192
+  },
+  "Laozi - Tao Te Ching": {
+    "token": "<author_Laozi>",
+    "token_id": 16123
+  },
+  "Confucius - The Analects": {
+    "token": "<author_Confucius>",
+    "token_id": 16048
+  },
+  "Sun Tzu - The Art of War": {
+    "token": "<author_Tzu>",
+    "token_id": 16204
+  },
+  "Benjamin Franklin - The Autobiography of Benjamin Franklin": {
+    "token": "<author_Franklin>",
+    "token_id": 16079
+  },
+  "Miyamoto Musashi - The Book of Five Rings": {
+    "token": "<author_Musashi>",
+    "token_id": 16148
+  },
+  "Kakuzō Okakura - The Book of Tea": {
+    "token": "<author_Okakura>",
+    "token_id": 16157
+  },
+  "Fyodor Dostoevsky - The Brothers Karamazov": {
+    "token": "<author_Dostoevsky>",
+    "token_id": 16060
+  },
+  "Geoffrey Chaucer - The Canterbury Tales (Middle English)": {
+    "token": "<author_Chaucer>",
+    "token_id": 16041
+  },
+  "Franz Kafka - The Castle": {
+    "token": "<author_Kafka>",
+    "token_id": 16113
+  },
+  "Michael Faraday - The Chemical History of a Candle (1861)": {
+    "token": "<author_Faraday>",
+    "token_id": 16074
+  },
+  "Oliver Wendell Holmes Jr. - The Common Law": {
+    "token": "<author_Jr>",
+    "token_id": 16111
+  },
+  "Karl Marx & Friedrich Engels - The Communist Manifesto": {
+    "token": "<author_Engels>",
+    "token_id": 16068
+  },
+  "Leo Tolstoy - The Death of Ivan Ilyich": {
+    "token": "<author_Tolstoy>",
+    "token_id": 16201
+  },
+  "Edward Gibbon - The Decline and Fall of the Roman Empire (selections)": {
+    "token": "<author_Gibbon>",
+    "token_id": 16086
+  },
+  "Epictetus - The Discourses": {
+    "token": "<author_Epictetus>",
+    "token_id": 16069
+  },
+  "The Epic of Gilgamesh": {
+    "token": "<author_anonymous>",
+    "token_id": 16228
+  },
+  "Immanuel Kant - The Fundamental Principles of the Metaphysic of Morals": {
+    "token": "<author_Kant>",
+    "token_id": 16115
+  },
+  "Friedrich Nietzsche - The Gay Science": {
+    "token": "<author_Nietzsche>",
+    "token_id": 16153
+  },
+  "F. Scott Fitzgerald - The Great Gatsby": {
+    "token": "<author_Fitzgerald>",
+    "token_id": 16078
+  },
+  "Fyodor Dostoevsky - The Idiot": {
+    "token": "<author_Dostoevsky>",
+    "token_id": 16060
+  },
+  "Homer - The Iliad": {
+    "token": "<author_Homer>",
+    "token_id": 16100
+  },
+  "Sigmund Freud - The Interpretation of Dreams": {
+    "token": "<author_Freud>",
+    "token_id": 16081
+  },
+  "Homer - The Odyssey": {
+    "token": "<author_Homer>",
+    "token_id": 16100
+  },
+  "Edgar Allan Poe - The Philosophy of Composition": {
+    "token": "<author_Poe>",
+    "token_id": 16166
+  },
+  "Jean Anthelme Brillat-Savarin - The Physiology of Taste": {
+    "token": "<author_Brillat-Savarin>",
+    "token_id": 16028
+  },
+  "Niccolò Machiavelli - The Prince": {
+    "token": "<author_Machiavelli>",
+    "token_id": 16135
+  },
+  "Snorri Sturluson — - The Prose Edda Poetic Edda": {
+    "token": "<author_anonymous>",
+    "token_id": 16228
+  },
+  "Max Weber - The Protestant Ethic and the Spirit of Capitalism": {
+    "token": "<author_Weber>",
+    "token_id": 16211
+  },
+  "Søren Kierkegaard - The Sickness Unto Death": {
+    "token": "<author_Kierkegaard>",
+    "token_id": 16120
+  },
+  "Jean-Jacques Rousseau - The Social Contract": {
+    "token": "<author_Rousseau>",
+    "token_id": 16172
+  },
+  "W.E.B. Du Bois - The Souls of Black Folk": {
+    "token": "<author_Bois>",
+    "token_id": 16026
+  },
+  "Murasaki Shikibu - The Tale of Genji": {
+    "token": "<author_Shikibu>",
+    "token_id": 16183
+  },
+  "Shakespeare - The Tempest": {
+    "token": "<author_Shakespeare>",
+    "token_id": 16179
+  },
+  "Franz Kafka - The Trial": {
+    "token": "<author_Kafka>",
+    "token_id": 16113
+  },
+  "Henry James - The Turn of the Screw": {
+    "token": "<author_James>",
+    "token_id": 16108
+  },
+  "William James - The Varieties of Religious Experience": {
+    "token": "<author_James>",
+    "token_id": 16108
+  },
+  "Margery Williams - The Velveteen Rabbit": {
+    "token": "<author_Williams>",
+    "token_id": 16219
+  },
+  "Charles Darwin - The Voyage of the Beagle (1839)": {
+    "token": "<author_Darwin>",
+    "token_id": 16053
+  },
+  "Adam Smith - The Wealth of Nations (selections)": {
+    "token": "<author_Smith>",
+    "token_id": 16185
+  },
+  "Friedrich Nietzsche - Thus Spoke Zarathustra": {
+    "token": "<author_Nietzsche>",
+    "token_id": 16153
+  },
+  "John Locke - Two Treatises of Government": {
+    "token": "<author_Locke>",
+    "token_id": 16130
+  },
+  "Leo Tolstoy - War and Peace": {
+    "token": "<author_Tolstoy>",
+    "token_id": 16201
+  },
+  "A.A. Milne - Winnie-the-Pooh": {
+    "token": "<author_Milne>",
+    "token_id": 16140
+  },
+  "Emily Brontë - Wuthering Heights": {
+    "token": "<author_Bront>",
+    "token_id": 16029
+  },
+  "Mark Twain - Adventures of Huckleberry Finn": {
+    "token": "<author_Twain>",
+    "token_id": 16203
+  },
+  "John Henry Newman - Apologia Pro Vita Sua": {
+    "token": "<author_Newman>",
+    "token_id": 16151
+  },
+  "Martin Luther - Concerning Christian Liberty": {
+    "token": "<author_Luther>",
+    "token_id": 16133
+  },
+  "Oscar Wilde - De Profundis": {
+    "token": "<author_Wilde>",
+    "token_id": 16218
+  },
+  "David Hume - Dialogues Concerning Natural Religion": {
+    "token": "<author_Hume>",
+    "token_id": 16105
+  },
+  "Antoine Lavoisier - Elements of Chemistry": {
+    "token": "<author_Lavoisier>",
+    "token_id": 16125
+  },
+  "Aristotle - Historia Animalium": {
+    "token": "<author_Aristotle>",
+    "token_id": 16010
+  },
+  "John Calvin - Institutes of the Christian Religion": {
+    "token": "<author_Calvin>",
+    "token_id": 16032
+  },
+  "Thomas Huxley - Man's Place in Nature": {
+    "token": "<author_Huxley>",
+    "token_id": 16107
+  },
+  "La Rochefoucauld - Maxims": {
+    "token": "<author_Rochefoucauld>",
+    "token_id": 16171
+  },
+  "Robert Hooke - Micrographia": {
+    "token": "<author_Hooke>",
+    "token_id": 16101
+  },
+  "Pliny the Elder - Natural History (selections)": {
+    "token": "<author_Elder>",
+    "token_id": 16065
+  },
+  "William Harvey - On the Motion of the Heart and Blood": {
+    "token": "<author_Harvey>",
+    "token_id": 16093
+  },
+  "Lucretius - On the Nature of Things": {
+    "token": "<author_Lucretius>",
+    "token_id": 16132
+  },
+  "Isaac Newton - Opticks": {
+    "token": "<author_Newton>",
+    "token_id": 16152
+  },
+  "Julian of Norwich - Revelations of Divine Love": {
+    "token": "<author_Norwich>",
+    "token_id": 16155
+  },
+  "Henri Poincaré - Science and Hypothesis": {
+    "token": "<author_Poincar>",
+    "token_id": 16167
+  },
+  "Jonathan Edwards - Selected Sermons": {
+    "token": "<author_Edwards>",
+    "token_id": 16063
+  },
+  "Molière - Tartuffe": {
+    "token": "<author_Molire>",
+    "token_id": 16142
+  },
+  "Aristophanes - The Birds": {
+    "token": "<author_Aristophanes>",
+    "token_id": 16009
+  },
+  "Boethius - The Consolation of Philosophy": {
+    "token": "<author_Boethius>",
+    "token_id": 16025
+  },
+  "Aristophanes - The Frogs": {
+    "token": "<author_Aristophanes>",
+    "token_id": 16009
+  },
+  "Oscar Wilde - The Importance of Being Earnest": {
+    "token": "<author_Wilde>",
+    "token_id": 16218
+  },
+  "Thomas à Kempis - The Imitation of Christ": {
+    "token": "<author_Kempis>",
+    "token_id": 16117
+  },
+  "Laurence Sterne - The Life and Opinions of Tristram Shandy": {
+    "token": "<author_Sterne>",
+    "token_id": 16191
+  },
+  "Jean-Henri Fabre - The Life of the Spider": {
+    "token": "<author_Fabre>",
+    "token_id": 16073
+  },
+  "Gilbert White - The Natural History of Selborne": {
+    "token": "<author_White>",
+    "token_id": 16215
+  },
+  "John Bunyan - The Pilgrim's Progress": {
+    "token": "<author_Bunyan>",
+    "token_id": 16030
+  },
+  "Robert Boyle - The Sceptical Chymist": {
+    "token": "<author_Boyle>",
+    "token_id": 16027
+  },
+  "Goethe - Theory of Colours": {
+    "token": "<author_Goethe>",
+    "token_id": 16087
+  },
+  "George Berkeley - Three Dialogues Between Hylas and Philonous": {
+    "token": "<author_Berkeley>",
+    "token_id": 16023
+  },
+  "Alexander von Humboldt - Views of Nature": {
+    "token": "<author_Humboldt>",
+    "token_id": 16104
+  },
+  "Mary Somerville - On the Connexion of the Physical Sciences": {
+    "token": "<author_Somerville>",
+    "token_id": 16186
+  },
+  "Book of Songs (Shijing)": {
+    "token": "<author_anonymous>",
+    "token_id": 16228
+  },
+  "Luo Guanzhong - Romance of the Three Kingdoms": {
+    "token": "<author_Guanzhong>",
+    "token_id": 16090
+  },
+  "Cao Xueqin - Dream of the Red Chamber (Vol. 1)": {
+    "token": "<author_Xueqin>",
+    "token_id": 16224
+  },
+  "Cao Xueqin - Dream of the Red Chamber (Vol. 2)": {
+    "token": "<author_Xueqin>",
+    "token_id": 16224
+  },
+  "Pu Songling - Strange Stories from a Chinese Studio": {
+    "token": "<author_Songling>",
+    "token_id": 16187
+  },
+  "Arthur Waley - A Hundred and Seventy Chinese Poems": {
+    "token": "<author_Waley>",
+    "token_id": 16210
+  },
+  "Arthur Waley - The Poet Li Po": {
+    "token": "<author_Waley>",
+    "token_id": 16210
+  },
+  "Arthur Waley - More Translations from the Chinese": {
+    "token": "<author_Waley>",
+    "token_id": 16210
+  },
+  "Florence Ayscough - Fir-Flower Tablets": {
+    "token": "<author_Ayscough>",
+    "token_id": 16015
+  },
+  "Margaret Fuller - Summer on the Lakes": {
+    "token": "<author_Fuller>",
+    "token_id": 16082
+  },
+  "Margaret Fuller - Woman in the Nineteenth Century": {
+    "token": "<author_Fuller>",
+    "token_id": 16082
+  },
+  "William James - Principles of Psychology Vol. 1": {
+    "token": "<author_James>",
+    "token_id": 16108
+  },
+  "William James - Principles of Psychology Vol. 2": {
+    "token": "<author_James>",
+    "token_id": 16108
+  },
+  "Henri Bergson - Creative Evolution": {
+    "token": "<author_Bergson>",
+    "token_id": 16022
+  },
+  "Henri Bergson - Time and Free Will": {
+    "token": "<author_Bergson>",
+    "token_id": 16022
+  },
+  "Amos Bronson Alcott - Tablets": {
+    "token": "<author_Alcott>",
+    "token_id": 16005
+  },
+  "Amos Bronson Alcott - Concord Days": {
+    "token": "<author_Alcott>",
+    "token_id": 16005
+  },
+  "Theodore Parker - Speeches and Sermons Vol. 1": {
+    "token": "<author_Parker>",
+    "token_id": 16161
+  },
+  "Walter Pater - The Renaissance": {
+    "token": "<author_Pater>",
+    "token_id": 16163
+  },
+  "Thomas De Quincey - Confessions of an English Opium-Eater": {
+    "token": "<author_Quincey>",
+    "token_id": 16168
+  },
+  "José Raúl Capablanca - Chess Fundamentals": {
+    "token": "<author_Capablanca>",
+    "token_id": 16033
+  },
+  "Carl von Clausewitz - On War": {
+    "token": "<author_Clausewitz>",
+    "token_id": 16045
+  },
+  "Gertrude Stein - Three Lives": {
+    "token": "<author_Stein>",
+    "token_id": 16190
+  },
+  "Gertrude Stein - Tender Buttons": {
+    "token": "<author_Stein>",
+    "token_id": 16190
+  },
+  "Cather - O Pioneers": {
+    "token": "<author_Cather>",
+    "token_id": 16038
+  },
+  "Chopin - The Awakening": {
+    "token": "<author_Chopin>",
+    "token_id": 16044
+  },
+  "Wharton - The Age of Innocence": {
+    "token": "<author_Wharton>",
+    "token_id": 16214
+  },
+  "Jewett - The Country of the Pointed Firs": {
+    "token": "<author_Jewett>",
+    "token_id": 16109
+  },
+  "Wharton - The House of Mirth": {
+    "token": "<author_Wharton>",
+    "token_id": 16214
+  },
+  "Behn - Oroonoko (Works Vol V)": {
+    "token": "<author_Behn>",
+    "token_id": 16021
+  },
+  "Virginia Woolf - Mrs Dalloway": {
+    "token": "<author_Woolf>",
+    "token_id": 16222
+  },
+  "Willa Cather - My Ántonia": {
+    "token": "<author_Cather>",
+    "token_id": 16038
+  },
+  "Sei Shōnagon - The Pillow Book": {
+    "token": "<author_Shnagon>",
+    "token_id": 16184
+  },
+  "Dorothy Wordsworth - Journals Vol. 1": {
+    "token": "<author_Wordsworth>",
+    "token_id": 16223
+  },
+  "George Sand - Indiana": {
+    "token": "<author_Sand>",
+    "token_id": 16174
+  },
+  "Edward Carpenter - Civilisation Its Cause and Cure": {
+    "token": "<author_Carpenter>",
+    "token_id": 16035
+  },
+  "Vernon Lee - Hauntings": {
+    "token": "<author_Lee>",
+    "token_id": 16126
+  },
+  "Kenneth Grahame - Wind in the Willows": {
+    "token": "<author_Grahame>",
+    "token_id": 16088
+  },
+  "Rudyard Kipling - The Jungle Book": {
+    "token": "<author_Kipling>",
+    "token_id": 16122
+  },
+  "Rudyard Kipling - Just So Stories": {
+    "token": "<author_Kipling>",
+    "token_id": 16122
+  },
+  "R.L. Stevenson - Treasure Island": {
+    "token": "<author_Stevenson>",
+    "token_id": 16192
+  },
+  "J.M. Barrie - Peter Pan": {
+    "token": "<author_Barrie>",
+    "token_id": 16017
+  },
+  "Frances Hodgson Burnett - The Secret Garden": {
+    "token": "<author_Burnett>",
+    "token_id": 16031
+  },
+  "Frances Hodgson Burnett - A Little Princess": {
+    "token": "<author_Burnett>",
+    "token_id": 16031
+  },
+  "George MacDonald - The Princess and the Goblin": {
+    "token": "<author_MacDonald>",
+    "token_id": 16134
+  },
+  "George MacDonald - At the Back of the North Wind": {
+    "token": "<author_MacDonald>",
+    "token_id": 16134
+  },
+  "Carlo Collodi - Pinocchio": {
+    "token": "<author_Collodi>",
+    "token_id": 16046
+  },
+  "L.M. Montgomery - Anne of Green Gables": {
+    "token": "<author_Montgomery>",
+    "token_id": 16144
+  },
+  "Anna Sewell - Black Beauty": {
+    "token": "<author_Sewell>",
+    "token_id": 16178
+  },
+  "Jack London - Call of the Wild": {
+    "token": "<author_London>",
+    "token_id": 16131
+  },
+  "Jack London - White Fang": {
+    "token": "<author_London>",
+    "token_id": 16131
+  },
+  "H.G. Wells - The Time Machine": {
+    "token": "<author_Wells>",
+    "token_id": 16213
+  },
+  "Rudyard Kipling - Kim": {
+    "token": "<author_Kipling>",
+    "token_id": 16122
+  },
+  "R.L. Stevenson - Kidnapped": {
+    "token": "<author_Stevenson>",
+    "token_id": 16192
+  },
+  "L. Frank Baum - The Wonderful Wizard of Oz": {
+    "token": "<author_Baum>",
+    "token_id": 16020
+  },
+  "E. Nesbit - The Railway Children": {
+    "token": "<author_Nesbit>",
+    "token_id": 16150
+  },
+  "Daniel Defoe - Robinson Crusoe": {
+    "token": "<author_Defoe>",
+    "token_id": 16054
+  },
+  "Charles Kingsley - The Water-Babies": {
+    "token": "<author_Kingsley>",
+    "token_id": 16121
+  },
+  "Lewis Carroll - Alice in Wonderland": {
+    "token": "<author_Carroll>",
+    "token_id": 16036
+  },
+  "Lewis Carroll - Through the Looking-Glass": {
+    "token": "<author_Carroll>",
+    "token_id": 16036
+  },
+  "Webster - Unabridged Dictionary 1913": {
+    "token": "<author_Webster>",
+    "token_id": 16212
+  },
+  "English Words with Latin and Greek Roots": {
+    "token": "<author_Various>",
+    "token_id": 16205
+  },
+  "Greek Anthology Vol 1": {
+    "token": "<author_Various>",
+    "token_id": 16205
+  },
+  "Basho - Narrow Road to the Deep North": {
+    "token": "<author_Basho>",
+    "token_id": 16019
+  },
+  "Rubaiyat of Omar Khayyam": {
+    "token": "<author_Fitzgerald>",
+    "token_id": 16078
+  },
+  "Paulo Freire - Pedagogy of the Oppressed": {
+    "token": "<author_Freire>",
+    "token_id": 16080
+  }
+}

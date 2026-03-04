@@ -1,0 +1,769 @@
+{
+  "_metadata": {
+    "description": "LLM-identified start lines for primary text in raw corpus files. Line numbers are 1-indexed (matching the Read tool). Files marked wrong_file:true contain the wrong text entirely.",
+    "generated": "2026-03-03",
+    "method": "10 parallel Sonnet agents reading first 300 lines of each raw file"
+  },
+  "1001 Nights (selected).txt": {
+    "start_line": 1368,
+    "notes": "Lane-Poole advertisement, editor's preface, illustration list (900-1360). Primary text: frame narrative introduction."
+  },
+  "A.A. Milne - Winnie-the-Pooh.txt": {
+    "start_line": 124,
+    "notes": "Author's dedication 'TO HER' at 124. Author's Introduction at 138. ToC 187-214. Chapter I at 223."
+  },
+  "Adam Smith - The Wealth of Nations (selections).txt": {
+    "start_line": 110,
+    "notes": "ToC 39-107. Smith's own 'INTRODUCTION AND PLAN OF THE WORK' at 110."
+  },
+  "Aesop - Aesop's Fables.txt": {
+    "start_line": 920,
+    "notes": "G.K. Chesterton introduction (57-196, not Aesop's). ToC 200-917. First fable at 920."
+  },
+  "Alexis de Tocqueville - Democracy in America (selections).txt": {
+    "start_line": 128,
+    "notes": "ToC 52-118. Tocqueville's own Introductory Chapter at 128."
+  },
+  "Aristotle - Nicomachean Ethics.txt": {
+    "start_line": 860,
+    "notes": "J.A. Smith's scholarly introduction 55-859. BOOK I at 860."
+  },
+  "Aristotle - Poetics.txt": {
+    "start_line": 100,
+    "notes": "Transcriber's note 47-57. Analysis of Contents 62-96. 'ARISTOTLE'S POETICS' heading at 100."
+  },
+  "Augustine - Confessions.txt": {
+    "start_line": 48,
+    "notes": "No editor introduction. BOOK I at 48."
+  },
+  "Benjamin Franklin - The Autobiography of Benjamin Franklin.txt": {
+    "start_line": 129,
+    "notes": "Editor Charles Eliot's Introductory Note 52-126. Franklin's own text at 129."
+  },
+  "Beowulf (Old English).txt": {
+    "start_line": 928,
+    "notes": "Translator Hall's preface (196-362), abbreviations, bibliography of translations, glossary (452-787), word list (793-922). Poem at 928."
+  },
+  "Bhagavad Gita.txt": {
+    "start_line": 172,
+    "notes": "Translator Arnold's preface 79-143. ToC 148-168. Chapter I at 172."
+  },
+  "Blaise Pascal - Pens\u00e9es.txt": {
+    "start_line": 580,
+    "notes": "T.S. Eliot's introduction (66-578, editor not Pascal). SECTION I at 580."
+  },
+  "Brothers Grimm - Grimm's Fairy Tales.txt": {
+    "start_line": 121,
+    "notes": "Preparer's note 39-44, Contents 48-117. 'THE BROTHERS GRIMM FAIRY TALES' heading at 121."
+  },
+  "Charles Darwin - On the Origin of Species (1859).txt": {
+    "start_line": 313,
+    "notes": "Editor's note 29-38, title page with epigraphs 42-76, ToC 79-308. Darwin's own INTRODUCTION at 313."
+  },
+  "Charles Darwin - The Voyage of the Beagle (1839).txt": {
+    "start_line": 53,
+    "notes": "Transcriber's note 39-43. Darwin's own PREFACE at 53."
+  },
+  "Charles Dickens - A Christmas Carol.txt": {
+    "start_line": 44,
+    "notes": "Dickens' own PREFACE at 44. Contents 58-64. STAVE I at 68."
+  },
+  "Charlotte Bront\u00eb - Jane Eyre.txt": {
+    "start_line": 31,
+    "notes": "All front matter is author's own: title 31, dedication to Thackeray 47, author's PREFACE 59, Note to Third Edition 154. Chapter I at 174."
+  },
+  "Claude Shannon - A Mathematical Theory of Communication (1948).txt": {
+    "start_line": null,
+    "wrong_file": true,
+    "notes": "WRONG FILE: Contains Eddington's Mathematical Theory of Relativity in LaTeX format."
+  },
+  "Confucius - The Analects.txt": {
+    "start_line": 87,
+    "notes": "Digitizer/transcriber notes 33-61. Series title page 68-82. 'CONFUCIAN ANALECTS' at 87."
+  },
+  "D'Arcy Wentworth Thompson - On Growth and Form (1917).txt": {
+    "start_line": 976,
+    "notes": "Author's epigraph 71-75, author's Prefatory Note 80-157, Contents 162-205, List of Illustrations 210-975. Chapter I at 976."
+  },
+  "Dante - Divine Comedy.txt": {
+    "start_line": 160,
+    "notes": "Title/translator info 32-44. List of Cantos (ToC) 49-155. 'HELL OR THE INFERNO' heading at 160."
+  },
+  "David Hume - An Enquiry Concerning Human Understanding.txt": {
+    "start_line": 88,
+    "notes": "Title/editor info 44-58. Contents 65-83. SECTION I at 88."
+  },
+  "Dhammapada.txt": {
+    "start_line": 87,
+    "notes": "Title/series info 32-46. Contents 55-82. 'DHAMMAPADA' heading at 87."
+  },
+  "Edgar Allan Poe - The Philosophy of Composition.txt": {
+    "start_line": 112,
+    "notes": "Title/illustration 31-66. Contents 70-75. Publisher's foreword 82-107 (not Poe's). Essay heading at 112."
+  },
+  "Edward Gibbon - The Decline and Fall of the Roman Empire (selections).txt": {
+    "start_line": 2084,
+    "notes": "Enormous ToC (~38-1154), editor Milman's preface (~1155-1778), Gibbon's own prefaces to volumes (~1779-2083). Chapter I at 2084."
+  },
+  "Edwin Abbott - Flatland.txt": {
+    "start_line": 108,
+    "notes": "Dedication 54-72. ToC 77-104. 'FLATLAND / PART I' heading at 108."
+  },
+  "Elias L\u00f6nnrot (compiled) - Kalevala.txt": {
+    "start_line": 1107,
+    "notes": "ToC 58-114. Translator Crawford's preface 119-1097. THE KALEVALA / PROEM at 1107."
+  },
+  "Emily Bront\u00eb - Wuthering Heights.txt": {
+    "start_line": 39,
+    "notes": "No front matter. CHAPTER I at 39."
+  },
+  "Emily Dickinson - Complete Poems.txt": {
+    "start_line": 181,
+    "notes": "Editors' preface by Higginson 39-106. Transcriber's note 113-171. Dickinson's dedication poem at 181."
+  },
+  "Epictetus - The Discourses.txt": {
+    "start_line": 144,
+    "notes": "Editor George Long's biographical note 43-143. Primary text heading at 144."
+  },
+  "F. Scott Fitzgerald - The Great Gatsby.txt": {
+    "start_line": 46,
+    "notes": "ToC 33-43. Author's dedication to Zelda at 46. Epigraph at 51. Chapter I at 59."
+  },
+  "Franz Kafka - Metamorphosis.txt": {
+    "start_line": 45,
+    "notes": "No front matter. Section I at 45."
+  },
+  "Franz Kafka - The Castle.txt": {
+    "start_line": null,
+    "wrong_file": true,
+    "notes": "WRONG FILE: Contains 'The Man Thou Gavest' by Harriet T. Comstock (PG 14858)."
+  },
+  "Franz Kafka - The Trial.txt": {
+    "start_line": 44,
+    "notes": "No front matter. Chapter One at 44."
+  },
+  "Frederick Douglass - Narrative of the Life of Frederick Douglass.txt": {
+    "start_line": 520,
+    "notes": "Garrison's preface 81-373. Wendell Phillips letter 378-487. Biographical sketch 491-515. Chapter I at 520."
+  },
+  "Friedrich Nietzsche - Beyond Good and Evil.txt": {
+    "start_line": 87,
+    "notes": "Transcriber's note 52-65. ToC 67-83. Nietzsche's own PREFACE at 87."
+  },
+  "Friedrich Nietzsche - Ecce Homo.txt": {
+    "start_line": 320,
+    "notes": "Translator's Introduction 104-315. Nietzsche's own PREFACE at 320."
+  },
+  "Friedrich Nietzsche - On the Genealogy of Morality.txt": {
+    "start_line": 85,
+    "notes": "Editor's Note 55-68. ToC 72-82. Nietzsche's own PREFACE at 85."
+  },
+  "Friedrich Nietzsche - The Gay Science.txt": {
+    "start_line": 173,
+    "notes": "Editorial Note 141-168. Nietzsche's own 'PREFACE TO THE SECOND EDITION' at 173."
+  },
+  "Friedrich Nietzsche - Thus Spoke Zarathustra.txt": {
+    "start_line": 706,
+    "notes": "Mrs Forster-Nietzsche's introduction 239-705. ZARATHUSTRA'S PROLOGUE at 706."
+  },
+  "Fyodor Dostoevsky - Crime and Punishment.txt": {
+    "start_line": 136,
+    "notes": "Garnett's translator preface (biographical sketch) 45-127. PART I at 136."
+  },
+  "Fyodor Dostoevsky - Demons (The Possessed).txt": {
+    "start_line": 74,
+    "notes": "ToC 39-69. Dostoevsky's own epigraphs (Pushkin + Luke) at 74. Part I/Chapter I at 109."
+  },
+  "Fyodor Dostoevsky - Notes from Underground.txt": {
+    "start_line": 71,
+    "notes": "ToC ends ~66. Title heading at 71. Author's own note at 75. Famous opening at 100."
+  },
+  "Fyodor Dostoevsky - The Brothers Karamazov.txt": {
+    "start_line": 167,
+    "notes": "ToC 42-162. PART I / Book I at 167."
+  },
+  "Fyodor Dostoevsky - The Idiot.txt": {
+    "start_line": 51,
+    "notes": "Brief ToC 41-46. PART I at 51."
+  },
+  "Geoffrey Chaucer - The Canterbury Tales (Middle English).txt": {
+    "start_line": 1342,
+    "notes": "Transcriber's Notes 91-148, editor's Preface 151-337, Life of Chaucer 343-1341. 'THE CANTERBURY TALES.' at 1342. PROLOGUE at 1347."
+  },
+  "George Eliot - Middlemarch.txt": {
+    "start_line": 152,
+    "notes": "Dedication 37-38, ToC 41-147. Eliot's own PRELUDE at 152."
+  },
+  "Henry David Thoreau - Civil Disobedience Walden.txt": {
+    "start_line": 79,
+    "notes": "ToC 43-68. Thoreau's epigraph 72-74. WALDEN heading at 79."
+  },
+  "Henry James - The Turn of the Screw.txt": {
+    "start_line": 70,
+    "notes": "ToC 38-66. Title heading at 70. Narrative at 72."
+  },
+  "Herman Melville - Billy Budd.txt": {
+    "start_line": null,
+    "wrong_file": true,
+    "notes": "WRONG FILE: Contains 'Novelle lombarde' by Avancinio Avancini in Italian (PG 21422)."
+  },
+  "Herman Melville - Moby-Dick.txt": {
+    "start_line": 336,
+    "notes": "ToC 40-319. Transcriber's note 324-330. Melville's own ETYMOLOGY at 336 (part of the work). Chapter 1 at 844."
+  },
+  "Hermann Hesse - Siddhartha.txt": {
+    "start_line": 64,
+    "notes": "ToC 42-59. FIRST PART heading at 64. Dedication to Romain Rolland at 66."
+  },
+  "Herodotus - Histories (selections).txt": {
+    "start_line": 117,
+    "notes": "Editor's NOTE (biographical) 50-112. Primary text heading at 117."
+  },
+  "Homer - The Iliad.txt": {
+    "start_line": 2039,
+    "notes": "Buckley's INTRODUCTION 165-1179. Pope's PREFACE 1187-2035. BOOK I at 2039. Actual verse at 2073."
+  },
+  "Homer - The Odyssey.txt": {
+    "start_line": 370,
+    "notes": "Butler's Preface to First Edition 86-296. Preface to Second Edition 301-368. 'THE ODYSSEY' heading at 370. BOOK I at 375."
+  },
+  "Immanuel Kant - Critique of Pure Reason (selections).txt": {
+    "start_line": 339,
+    "notes": "Long ToC 43-337. Kant's own PREFACE TO THE FIRST EDITION at 339."
+  },
+  "Immanuel Kant - The Fundamental Principles of the Metaphysic of Morals.txt": {
+    "start_line": 47,
+    "notes": "Title block 38-44. Kant's own PREFACE at 47."
+  },
+  "James Clerk Maxwell - A Treatise on Electricity and Magnetism.txt": {
+    "start_line": null,
+    "wrong_file": true,
+    "notes": "WRONG FILE: Contains Francis Penrose's 'A Treatise on Electricity' (1752), not Maxwell."
+  },
+  "James Joyce - Dubliners.txt": {
+    "start_line": 60,
+    "notes": "Title and ToC 34-55. 'THE SISTERS' heading at 60."
+  },
+  "Jane Austen - Persuasion.txt": {
+    "start_line": 71,
+    "notes": "ToC 40-66. CHAPTER I at 71."
+  },
+  "Jane Austen - Pride and Prejudice.txt": {
+    "start_line": 704,
+    "notes": "George Saintsbury preface (editor) 95-490. Novel text with 'Chapter I.' at 704."
+  },
+  "Jean Anthelme Brillat-Savarin - The Physiology of Taste.txt": {
+    "start_line": 650,
+    "notes": "ToC 59-541. Translator's biographical sketch 543-649. Author's own APHORISMS at 650."
+  },
+  "Jean-Jacques Rousseau - The Social Contract.txt": {
+    "start_line": 1673,
+    "notes": "Editor Cole's introduction 69-1562. Second ToC 1566-1653. Rousseau's own FOREWORD at 1673."
+  },
+  "John Keats - Letters.txt": {
+    "start_line": 687,
+    "notes": "ToC 82-419. Editor Sidney Colvin's Preface 422-677. First letter at 687."
+  },
+  "John Locke - Two Treatises of Government.txt": {
+    "start_line": 81,
+    "notes": "Locke's own PREFACE at 81. Book II Chapter I at 155."
+  },
+  "John Milton - Areopagitica.txt": {
+    "start_line": 38,
+    "notes": "No editorial front matter. Title and epigraph at 38. Speech text at 53."
+  },
+  "John Milton - Paradise Lost.txt": {
+    "start_line": 104,
+    "notes": "PG editorial introduction 54-99. Poem at 104. Book I at 107."
+  },
+  "John Stuart Mill - On Liberty.txt": {
+    "start_line": 490,
+    "notes": "Mill's dedication 53-65, then editor Courtney's introduction 70-432, ToC 449-477, epigraph 481-485. Chapter I at 490. Dedication lost to avoid 360-line editor intro."
+  },
+  "Jonathan Swift - Gulliver's Travels.txt": {
+    "start_line": 58,
+    "notes": "Publisher to the Reader (58) and Gulliver's Letter (112) are both Swift's own fictional framing. Part I Chapter I at 253."
+  },
+  "Joseph Conrad - Heart of Darkness.txt": {
+    "start_line": 46,
+    "notes": "No front matter. Section I at 46."
+  },
+  "Juvenal - Satires.txt": {
+    "start_line": 2966,
+    "notes": "Translator's Preface 105-165. Life of Juvenal 200-312. Essay on Roman Satirists 744-2743. Arguments 2744-2964. SATIRE I at 2966."
+  },
+  "Kakuz\u014d Okakura - The Book of Tea.txt": {
+    "start_line": 45,
+    "notes": "No front matter. 'I. The Cup of Humanity' at 45."
+  },
+  "Karl Marx & Friedrich Engels - The Communist Manifesto.txt": {
+    "start_line": 53,
+    "notes": "ToC 43-48. Opening preamble at 53."
+  },
+  "Laozi - Tao Te Ching.txt": {
+    "start_line": 57,
+    "notes": "No editor introduction. Chapter 1 at 57."
+  },
+  "Leo Tolstoy - Anna Karenina.txt": {
+    "start_line": 57,
+    "notes": "Brief ToC 42-52. PART ONE / Chapter 1 at 57."
+  },
+  "Leo Tolstoy - The Death of Ivan Ilyich.txt": {
+    "start_line": null,
+    "wrong_file": true,
+    "notes": "WRONG FILE: Contains 'The Lamplighter' by Charles Dickens (PG 927)."
+  },
+  "Leo Tolstoy - War and Peace.txt": {
+    "start_line": 832,
+    "notes": "Enormous ToC 41-831. BOOK ONE: 1805 at 832."
+  },
+  "Lewis Carroll - Alice's Adventures in Wonderland Through the Looking-Glass.txt": {
+    "start_line": 58,
+    "notes": "ToC 40-53. CHAPTER I at 58."
+  },
+  "Marcus Aurelius - Meditations.txt": {
+    "start_line": 555,
+    "notes": "Editor's Introduction 77-544 (biography, Stoicism history). Author's FIRST BOOK at 555."
+  },
+  "Margery Williams - The Velveteen Rabbit.txt": {
+    "start_line": 59,
+    "notes": "Dedication 43-46. List of Illustrations 48-57. Primary text at 59."
+  },
+  "Mary Shelley - Frankenstein.txt": {
+    "start_line": 71,
+    "notes": "ToC 37-67. Letter 1 (Walton's epistolary opening) at 71."
+  },
+  "Mary Wollstonecraft - A Vindication of the Rights of Woman.txt": {
+    "start_line": 270,
+    "notes": "Editorial Biographical Sketch 93-267. Author's own dedication to Talleyrand at 270."
+  },
+  "Max Weber - The Protestant Ethic and the Spirit of Capitalism.txt": {
+    "start_line": null,
+    "wrong_file": true,
+    "notes": "WRONG FILE: Contains 'Pietro Mascagni' by Bastianelli in Italian (PG 46773)."
+  },
+  "Michael Faraday - The Chemical History of a Candle (1861).txt": {
+    "start_line": 139,
+    "notes": "Editor Crookes' Preface 55-91. ToC 96-134. LECTURE I at 139."
+  },
+  "Michel de Montaigne - Essays.txt": {
+    "start_line": 2028,
+    "notes": "Editor Hazlitt's preface 53-165, ToC 171-294, Life of Montaigne 299-2026. Montaigne's own 'TO THE READER' at 2028."
+  },
+  "Miguel de Cervantes - Don Quixote.txt": {
+    "start_line": 2099,
+    "notes": "ToC ~100-315, Ormsby's translator Introduction ~316-821, biographical section ~822-1632, critical section ~1633-2098. Cervantes's own AUTHOR'S PREFACE at 2099."
+  },
+  "Miyamoto Musashi - The Book of Five Rings.txt": {
+    "start_line": null,
+    "wrong_file": true,
+    "notes": "WRONG FILE: Contains Lafcadio Hearn's 'Out of the East' (PG 55802)."
+  },
+  "Murasaki Shikibu - The Tale of Genji.txt": {
+    "start_line": 264,
+    "notes": "Waley's translator preface 46-103. Contents 107-124. Character list 129-198. Genealogical tables 203-260. CHAPTER I at 264."
+  },
+  "Niccol\u00f2 Machiavelli - The Prince.txt": {
+    "start_line": 495,
+    "notes": "Translator Marriott's Introduction 91-493. Machiavelli's own DEDICATION at 495."
+  },
+  "Oliver Wendell Holmes Jr. - The Common Law.txt": {
+    "start_line": 69,
+    "notes": "Transcriber's notes 44-65. LECTURE I at 69."
+  },
+  "Ovid - Metamorphoses.txt": {
+    "start_line": 483,
+    "notes": "Transcriber's note 30-46. Editor's Introduction 75-204. Synoptical View 208-391. Second Introduction 395-466. 'THE METAMORPHOSES' at 473. BOOK THE FIRST at 478. Primary verse at 483."
+  },
+  "Plato - Apology Phaedo Republic Symposium Meno Gorgias Theaetetus.txt": {
+    "start_line": 8640,
+    "notes": "WARNING: File contains ONLY the Republic despite omnibus filename. Jowett's INTRODUCTION AND ANALYSIS runs 62-8604 (!). 'THE REPUBLIC' heading at 8605. BOOK I at 8637. Dialogue text at 8640."
+  },
+  "R.L. Stevenson - Strange Case of Dr Jekyll and Mr Hyde.txt": {
+    "start_line": 58,
+    "notes": "ToC 34-56. 'STORY OF THE DOOR' at 58."
+  },
+  "Rainer Maria Rilke - Letters to a Young Poet.txt": {
+    "start_line": null,
+    "wrong_file": true,
+    "notes": "WRONG FILE: Contains 'Library of the Best American Literature' anthology (PG 69620). No Rilke."
+  },
+  "Ralph Waldo Emerson - Self-Reliance Experience.txt": {
+    "start_line": 541,
+    "notes": "Editor's Life of Emerson 119-289. Critical Opinions 290-519. Chronological list 523-537. 'THE AMERICAN SCHOLAR' at 541. SELF-RELIANCE at 1998."
+  },
+  "Ren\u00e9 Descartes - Meditations on First Philosophy.txt": {
+    "start_line": 54,
+    "notes": "WARNING: File is actually 'Discourse on the Method' (PG 59), not Meditations. Descartes's own PREFATORY NOTE at 54."
+  },
+  "Shakespeare - Hamlet.txt": {
+    "start_line": 74,
+    "notes": "ToC 39-70. Dramatis Personae 74-102 (structural, kept). ACT I at 107."
+  },
+  "Shakespeare - King Lear.txt": {
+    "start_line": 80,
+    "notes": "ToC 39-75. Dramatis Personae 80-107 (structural, kept). ACT I at 112."
+  },
+  "Shakespeare - Macbeth.txt": {
+    "start_line": 86,
+    "notes": "ToC 39-82. Dramatis Personae 86-121 (structural, kept). ACT I at 126."
+  },
+  "Shakespeare - Othello.txt": {
+    "start_line": 69,
+    "notes": "ToC 39-65. Dramatis Personae 69-91 (structural, kept). ACT I at 96."
+  },
+  "Shakespeare - Sonnets.txt": {
+    "start_line": 35,
+    "notes": "Title at 28. Sonnet I at 35."
+  },
+  "Shakespeare - The Tempest.txt": {
+    "start_line": 86,
+    "notes": "Transcriber's note 34-54. Cambridge edition title page 59-81. 'THE TEMPEST.' heading at 86. Dramatis Personae 91-128 (kept). ACT I at 138."
+  },
+  "Sigmund Freud - The Interpretation of Dreams.txt": {
+    "start_line": 283,
+    "notes": "WARNING: File is actually 'A General Introduction to Psychoanalysis', not Interpretation of Dreams. Translator's preface (G. Stanley Hall) 76-187. ToC 192-271. PART I / FIRST LECTURE at 283."
+  },
+  "Sir Gawain and the Green Knight (Middle English).txt": {
+    "start_line": 252,
+    "notes": "WARNING: File is Jessie L. Weston's 1898 prose retelling, not the Middle English original. Weston's preface 51-167. ToC 174-247. Primary text at 252."
+  },
+  "Snorri Sturluson \u2014 - The Prose Edda Poetic Edda.txt": {
+    "start_line": 490,
+    "notes": "Translator Thorpe's preface 203-366. Footnotes 370-430. Editor's Introduction to the Voluspa 435-489. VOLUSPA at 490."
+  },
+  "S\u00f8ren Kierkegaard - The Sickness Unto Death.txt": {
+    "start_line": null,
+    "wrong_file": true,
+    "notes": "WRONG FILE: Contains 'El Mulato Pl\u00e1cido' by Joaqu\u00edn Lemoine in Spanish (PG 44305)."
+  },
+  "Sun Tzu - The Art of War.txt": {
+    "start_line": 1614,
+    "notes": "PG digitizer preface 89-162. Translator Giles' preface 165-268. Scholarly Introduction 271-1613. Chapter I at 1614."
+  },
+  "The Epic of Gilgamesh.txt": {
+    "start_line": null,
+    "wrong_file": true,
+    "notes": "WRONG FILE: Contains 'Ennen p\u00e4iv\u00e4nkoittoa' by Clara Viebig in Finnish (PG 74882)."
+  },
+  "Thomas Hobbes - Leviathan (selections).txt": {
+    "start_line": 114,
+    "notes": "Transcriber's notes 50-111. Hobbes's own dedication at 114. ToC 160-300. THE INTRODUCTION at 305."
+  },
+  "Thomas Paine - Common Sense.txt": {
+    "start_line": 29,
+    "notes": "Everything from line 29 is Paine's own text."
+  },
+  "Thucydides - History of the Peloponnesian War.txt": {
+    "start_line": 100,
+    "notes": "Translator Crawley's dedication 41-49. ToC 52-94. BOOK I at 100."
+  },
+  "Virgil - Aeneid.txt": {
+    "start_line": 92,
+    "notes": "ToC 41-65. Translator's ARGUMENT for Book I 70-89. Actual verse 'Arms, and the man I sing' at 92."
+  },
+  "Voltaire - Candide.txt": {
+    "start_line": 307,
+    "notes": "Transcriber's note 37-45. Publisher's blurb 49-65. Philip Littell's editorial introduction 90-196. ToC 201-299. 'CANDIDE' heading at 307."
+  },
+  "W.E.B. Du Bois - The Souls of Black Folk.txt": {
+    "start_line": 53,
+    "notes": "ToC 34-51. Du Bois's own dedication at 53. 'The Forethought' at 60."
+  },
+  "Walt Whitman - Leaves of Grass (1855 edition).txt": {
+    "start_line": 29,
+    "notes": "No front matter. Title at 29. Epigraph poem 35-45. BOOK I at 51."
+  },
+  "Wassily Kandinsky - Concerning the Spiritual in Art.txt": {
+    "start_line": 536,
+    "notes": "ToC 57-77. List of illustrations 80-103. Translator Sadleir's introduction 106-532. Kandinsky's own dedication at 536."
+  },
+  "William James - The Varieties of Religious Experience.txt": {
+    "start_line": 85,
+    "notes": "ToC 52-72. James's own dedication at 85. James's own Preface at 95. Lecture I at 144."
+  },
+  "Alexander von Humboldt - Views of Nature.txt": {
+    "start_line": 1136,
+    "notes": "Skipping publisher's preface by Bohn, author's prefaces to editions, table of contents, and extended Summary of Contents. First essay 'On Steppes and Deserts' begins at 1136."
+  },
+  "Behn - Oroonoko (Works Vol V).txt": {
+    "start_line": 4214,
+    "notes": "Skipping all preceding stories in Vol V collection, Montague Summers' editor introduction, and Behn's Epistle Dedicatory. Novel narrative begins at 4214."
+  },
+  "Edith Wharton - The House of Mirth.txt": {
+    "start_line": 47,
+    "notes": "No editor introduction or preface. Novel begins immediately."
+  },
+  "Henri Bergson - Time and Free Will.txt": {
+    "start_line": 855,
+    "notes": "Skipping translator's preface by Pogson, bibliography, and chapter table of contents. Chapter I begins at 855."
+  },
+  "Julian of Norwich - Revelations of Divine Love.txt": {
+    "start_line": 2010,
+    "notes": "Skipping editor's Notes on Manuscripts, Note as to Two Julians, and Grace Warrack's three-part Introduction. Julian's Chapter I begins at 2010."
+  },
+  "Moli\u00e8re - Tartuffe.txt": {
+    "start_line": 107,
+    "notes": "Skipping translator's introductory note. Dramatis Personae at 107, Act I at 128."
+  },
+  "Thomas Huxley - Man's Place in Nature.txt": {
+    "start_line": 59,
+    "notes": "No editor introduction. Essay begins immediately at 59."
+  },
+  "William James - Principles of Psychology Vol. 2.txt": {
+    "start_line": 242,
+    "notes": "Skipping table of contents. Chapter XVII begins at 242."
+  },
+  "Amos Bronson Alcott - Concord Days.txt": {
+    "start_line": 187,
+    "notes": "Skipping table of contents. First prose by Alcott begins at 187."
+  },
+  "Boethius - The Consolation of Philosophy.txt": {
+    "start_line": 284,
+    "notes": "Skipping translator H.R. James's preface, biographical Proem, and index. Song I begins at 284."
+  },
+  "Edward Carpenter - Civilisation Its Cause and Cure.txt": {
+    "start_line": 70,
+    "notes": "Author's own Preface to Complete Edition begins at 70. Keeping author's preface."
+  },
+  "Henri Poincar\u00e9 - Science and Hypothesis.txt": {
+    "start_line": 487,
+    "notes": "Skipping series advertising, table of contents, and translator Halsted's biographical essay. Poincar\u00e9's own Author's Preface begins at 487."
+  },
+  "La Rochefoucauld - Maxims.txt": {
+    "start_line": 871,
+    "notes": "Skipping translator's preface and lengthy translator's introduction. Author's maxims begin at 871."
+  },
+  "Oscar Wilde - De Profundis.txt": {
+    "start_line": 45,
+    "notes": "No editor introduction. Text begins immediately at 45."
+  },
+  "Thomas \u00e0 Kempis - The Imitation of Christ.txt": {
+    "start_line": 229,
+    "notes": "Skipping table of contents and translator Benham's Introductory Note. Chapter I of Book I begins at 229."
+  },
+  "Amos Bronson Alcott - Tablets.txt": {
+    "start_line": 236,
+    "notes": "Skipping table of contents. First prose section 'Antiquity' begins at 236."
+  },
+  "Book of Songs (Shijing).txt": {
+    "start_line": 1120,
+    "notes": "Skipping Legge's lengthy scholarly Introduction. First poem verse begins at 1120."
+  },
+  "Florence Ayscough - Fir-Flower Tablets.txt": {
+    "start_line": 2376,
+    "notes": "Skipping Amy Lowell's Preface, table of contents, and Florence Ayscough's lengthy Introduction. First poem begins at 2376."
+  },
+  "Isaac Newton - Opticks.txt": {
+    "start_line": 159,
+    "notes": "Skipping Newton's Advertisements and publisher's Advertisement. The First Book of Opticks begins at 159."
+  },
+  "Laurence Sterne - The Life and Opinions of Tristram Shandy.txt": {
+    "start_line": 51,
+    "notes": "Sterne's dedication to Mr. Pitt at 51. Novel narrative (Chapter I) at 87."
+  },
+  "Oscar Wilde - The Importance of Being Earnest.txt": {
+    "start_line": 35,
+    "notes": "Dramatis Personae at 35. First act at 78."
+  },
+  "Vernon Lee - Hauntings.txt": {
+    "start_line": 39,
+    "notes": "Author's dedication at 39, author's Preface at 47. First story at 159. Keeping author's preface."
+  },
+  "Antoine Lavoisier - Elements of Chemistry.txt": {
+    "start_line": 246,
+    "notes": "Skipping translator Kerr's Advertisement. Lavoisier's own Author's Preface begins at 246."
+  },
+  "Cao Xueqin - Dream of the Red Chamber (Vol. 1).txt": {
+    "start_line": 92,
+    "notes": "Skipping translator Joly's brief preface. Chapter I begins at 92."
+  },
+  "George Berkeley - Three Dialogues Between Hylas and Philonous.txt": {
+    "start_line": 57,
+    "notes": "No translator or editor introduction. First Dialogue begins at 57."
+  },
+  "Jean-Henri Fabre - The Life of the Spider.txt": {
+    "start_line": 40,
+    "notes": "No translator introduction or editor preface. Chapter I begins at 40."
+  },
+  "Lucretius - On the Nature of Things.txt": {
+    "start_line": 54,
+    "notes": "No translator introduction. Book I verse text begins at 54."
+  },
+  "Pliny the Elder - Natural History (selections).txt": {
+    "start_line": 1164,
+    "notes": "Skipping translator's Preface, editor biography of Pliny, and detailed 6-volume table of contents. Pliny's own dedicatory epistle to Titus begins at 1164."
+  },
+  "Virginia Woolf - Mrs Dalloway.txt": {
+    "start_line": 94,
+    "notes": "Skipping publisher's list of works, title page, copyright. Novel begins at 94."
+  },
+  "Aristophanes - The Birds.txt": {
+    "start_line": 176,
+    "notes": "Skipping translator's note and editor's Introduction. Dramatis Personae and scene description at 144. First dialogue at 176."
+  },
+  "Cao Xueqin - Dream of the Red Chamber (Vol. 2).txt": {
+    "start_line": 57,
+    "notes": "No translator or editor introduction. Narrative continues at Chapter XXV, line 57."
+  },
+  "George Sand - Indiana.txt": {
+    "start_line": 500,
+    "notes": "Skipping Sand's three retrospective prefaces (1852, 1832, 1842). Novel Part First, Chapter I at 500."
+  },
+  "Jewett - The Country of the Pointed Firs.txt": {
+    "start_line": 105,
+    "notes": "Skipping editorial biographical note and table of contents. Chapter I begins at 105."
+  },
+  "Luo Guanzhong - Romance of the Three Kingdoms.txt": {
+    "start_line": 274,
+    "notes": "Skipping table of contents and translator Brewitt-Taylor's preface. Chapter I begins at 274."
+  },
+  "Pu Songling - Strange Stories from a Chinese Studio.txt": {
+    "start_line": 968,
+    "notes": "Skipping table of contents and translator Herbert Giles' lengthy Introduction. First story begins at 968."
+  },
+  "Walter Pater - The Renaissance.txt": {
+    "start_line": 64,
+    "notes": "Pater's own Preface begins at 64. Keeping author's preface."
+  },
+  "Aristophanes - The Frogs.txt": {
+    "start_line": 112,
+    "notes": "Skipping Harvard Classics series info and editor's Introductory Note. Dramatis Personae at 112."
+  },
+  "Carl von Clausewitz - On War.txt": {
+    "start_line": 667,
+    "notes": "Skipping table of contents, Col. Maude's editor Introduction, and Marie von Clausewitz's preface. Clausewitz's own Notice begins at 667."
+  },
+  "Gertrude Stein - Tender Buttons.txt": {
+    "start_line": 64,
+    "notes": "Minimal front matter. OBJECTS section begins at 64."
+  },
+  "John Bunyan - The Pilgrim's Progress.txt": {
+    "start_line": 60,
+    "notes": "Author's Apology for his Book (Bunyan's own verse preface) at 60. Dream narrative at 345."
+  },
+  "Margaret Fuller - Summer on the Lakes.txt": {
+    "start_line": 44,
+    "notes": "Fuller's own prefatory poem at 44. Chapter I at 86."
+  },
+  "Robert Boyle - The Sceptical Chymist.txt": {
+    "start_line": 125,
+    "notes": "Skipping transcriber's notes and table of contents. Boyle's own Praeface Introductory at 125."
+  },
+  "Wharton - The Age of Innocence.txt": {
+    "start_line": 47,
+    "notes": "No editor introductions. Novel begins immediately at 47."
+  },
+  "Aristotle - Historia Animalium.txt": {
+    "start_line": 286,
+    "notes": "Skipping translator Cresswell's preface and Analytical Table of Contents. Book I, Chapter I at 286."
+  },
+  "Cather - O Pioneers.txt": {
+    "start_line": 133,
+    "notes": "Skipping table of contents, dedication, and prefatory poem. Narrative begins at 133."
+  },
+  "Gertrude Stein - Three Lives.txt": {
+    "start_line": 76,
+    "notes": "Skipping table of contents. The Good Anna begins at 76."
+  },
+  "John Calvin - Institutes of the Christian Religion.txt": {
+    "start_line": 593,
+    "notes": "Skipping publisher's Advertisement, translator Allen's preface, and Calvin's 1559 Author's Preface. Calvin's Dedication to King Francis begins at 593."
+  },
+  "Margaret Fuller - Woman in the Nineteenth Century.txt": {
+    "start_line": 402,
+    "notes": "Skipping editor Arthur Fuller's preface, Horace Greeley's introduction, and table of contents. Fuller's own Preface begins at 402."
+  },
+  "Robert Hooke - Micrographia.txt": {
+    "start_line": 107,
+    "notes": "Hooke's dedication to the King at 107. Keeping author's own prefatory material."
+  },
+  "Wharton - The House of Mirth.txt": {
+    "start_line": 47,
+    "notes": "No editor introduction. Novel begins immediately at 47."
+  },
+  "Arthur Waley - A Hundred and Seventy Chinese Poems.txt": {
+    "start_line": 1010,
+    "notes": "Skipping Preliminary Note, table of contents, and Waley's lengthy critical introduction. First poem title at 1010."
+  },
+  "Chopin - The Awakening.txt": {
+    "start_line": 111,
+    "notes": "Skipping table of contents. Narrative begins at 111."
+  },
+  "Gilbert White - The Natural History of Selborne.txt": {
+    "start_line": 391,
+    "notes": "Skipping prefatory poems and Advertisement. Letter I begins at 391."
+  },
+  "John Henry Newman - Apologia Pro Vita Sua.txt": {
+    "start_line": 206,
+    "notes": "Skipping publisher's biographical introduction by Rev. Wm. Barry and table of contents. Newman's text begins at 206."
+  },
+  "Mark Twain - Adventures of Huckleberry Finn.txt": {
+    "start_line": 381,
+    "notes": "Skipping table of contents and illustrations list. Twain's own Notice at 381, Explanatory at 393. Chapter I at 418."
+  },
+  "Sei Sh\u014dnagon - The Pillow Book.txt": {
+    "start_line": 439,
+    "notes": "Skipping Waley's critical introduction 'Japan in the Tenth Century'. First translated passage at 439."
+  },
+  "Willa Cather - My \u00c1ntonia.txt": {
+    "start_line": 138,
+    "notes": "Cather's own fictional frame Introduction at 138. Book I at 264. Keeping author's frame narrative."
+  },
+  "Arthur Waley - More Translations from the Chinese.txt": {
+    "start_line": 228,
+    "notes": "Skipping table of contents and translator's Introduction. First poem at 228."
+  },
+  "David Hume - Dialogues Concerning Natural Religion.txt": {
+    "start_line": 52,
+    "notes": "No editor introduction. Hume's own frame narrative (Pamphilus to Hermippus) at 52."
+  },
+  "Goethe - Theory of Colours.txt": {
+    "start_line": 267,
+    "notes": "Skipping Eastlake's Translator's Preface. Goethe's own Preface to the First Edition at 267."
+  },
+  "Jonathan Edwards - Selected Sermons.txt": {
+    "start_line": 781,
+    "notes": "Skipping editor Gardiner's lengthy biographical and critical Introduction. First sermon at 781."
+  },
+  "Martin Luther - Concerning Christian Liberty.txt": {
+    "start_line": 46,
+    "notes": "No editor introduction. Luther's letter to Pope Leo X at 46."
+  },
+  "Theodore Parker - Speeches and Sermons Vol. 1.txt": {
+    "start_line": 97,
+    "notes": "Parker's own Preface at 97. First sermon at 183."
+  },
+  "William Harvey - On the Motion of the Heart and Blood.txt": {
+    "start_line": 885,
+    "notes": "Skipping Everyman's Library front matter, Editor Parkyn's Introduction, and bibliography. Harvey's own dedication at 885."
+  },
+  "Arthur Waley - The Poet Li Po.txt": {
+    "start_line": 461,
+    "notes": "Skipping critical introduction, biographical Life of Li Po, and text notes. First poem at 461."
+  },
+  "Dorothy Wordsworth - Journals Vol. 1.txt": {
+    "start_line": 418,
+    "notes": "Skipping editor William Knight's extensive Prefatory Note. First journal entry (Alfoxden, January 20th 1798) at 418."
+  },
+  "Henri Bergson - Creative Evolution.txt": {
+    "start_line": 210,
+    "notes": "Skipping translator Mitchell's note and table of contents. Bergson's own Introduction at 210."
+  },
+  "Jos\u00e9 Ra\u00fal Capablanca - Chess Fundamentals.txt": {
+    "start_line": 78,
+    "notes": "Capablanca's own Preface at 78. Keeping author's preface."
+  },
+  "Mary Somerville - On the Connexion of the Physical Sciences.txt": {
+    "start_line": 607,
+    "notes": "Skipping very long table of contents. Somerville's Introduction at 607."
+  },
+  "Thomas De Quincey - Confessions of an English Opium-Eater.txt": {
+    "start_line": 45,
+    "notes": "No editor introduction. De Quincey's own 'To the Reader' at 45."
+  },
+  "William James - Principles of Psychology Vol. 1.txt": {
+    "start_line": 62,
+    "notes": "No editor introduction. James's own Preface at 62."
+  }
+}

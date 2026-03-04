@@ -1,0 +1,328 @@
+Title,Author,Downloaded,Cleaned,Category,Status,Source_Type,Source_ID,Source_URL,Filename,File_Size,Notes
+"""What to the Slave Is the Fourth of July?""",Frederick Douglass,yes,,Essays/Speech,Public Domain,manual,,https://loveman.sdsu.edu/docs/1852FrederickDouglass.pdf,,,Stale entry: PDF in Downloads not raw/. Needs extraction and move to raw/.
+1001 Nights (selected),—,yes,,Fables/Children's,Public Domain,gutenberg,34206,https://www.gutenberg.org/cache/epub/34206/pg34206.txt,1001 Nights (selected).txt,1520598,
+A Christmas Carol,Charles Dickens,yes,,Fiction,Public Domain,gutenberg,46,https://www.gutenberg.org/cache/epub/46/pg46.txt,Charles Dickens - A Christmas Carol.txt,182146,
+A Mathematical Theory of Communication (1948),Claude Shannon,wrong_file,,Science,Free (Harvard PDF),gutenberg,59248,https://www.gutenberg.org/cache/epub/59248/pg59248.txt,Claude Shannon - A Mathematical Theory of Communication (1948).txt,870764,WRONG: PG 59248 is Eddington's Relativity in LaTeX. Shannon paper not on Gutenberg — source from Harvard PDF.
+A Treatise on Electricity and Magnetism,James Clerk Maxwell,wrong_file,,Science/Engineering,Public Domain,gutenberg,60392,https://www.gutenberg.org/cache/epub/60392/pg60392.txt,James Clerk Maxwell - A Treatise on Electricity and Magnetism.txt,71207,WRONG: PG 60392 is Penrose's 1752 treatise. Maxwell's Treatise may not be on Gutenberg — check archive.org.
+A Vindication of the Rights of Woman,Mary Wollstonecraft,yes,,Essays,Public Domain,gutenberg,3420,https://www.gutenberg.org/cache/epub/3420/pg3420.txt,Mary Wollstonecraft - A Vindication of the Rights of Woman.txt,538105,
+Aboriginal Dreamtime Stories (selected),—,no,,Fables/Children's,Public Domain (traditional),manual,,,,,
+Aeneid,Virgil,yes,,Poetry/Epic,Public Domain,gutenberg,228,https://www.gutenberg.org/cache/epub/228/pg228.txt,Virgil - Aeneid.txt,731128,
+Aesop's Fables,Aesop,yes,,Fables/Children's,Public Domain,gutenberg,11339,https://www.gutenberg.org/cache/epub/11339/pg11339.txt,Aesop - Aesop's Fables.txt,241617,
+Alice's Adventures in Wonderland / Through the Looking-Glass,Lewis Carroll,yes,,Candidates,Public Domain,gutenberg,11,https://www.gutenberg.org/cache/epub/11/pg11.txt,Lewis Carroll - Alice's Adventures in Wonderland Through the Looking-Glass.txt,167713,
+An Enquiry Concerning Human Understanding,David Hume,yes,,Philosophy,Public Domain,gutenberg,9662,https://www.gutenberg.org/cache/epub/9662/pg9662.txt,David Hume - An Enquiry Concerning Human Understanding.txt,373213,
+An Image of Africa,Chinua Achebe,no,,Essays/African,Public Domain (kirbyk.net),manual,,,,,
+Anansi Stories (selected),—,no,,Fables/Children's,Public Domain (traditional),manual,,,,,
+Anna Karenina,Leo Tolstoy,yes,,Fiction,Public Domain,gutenberg,1399,https://www.gutenberg.org/cache/epub/1399/pg1399.txt,Leo Tolstoy - Anna Karenina.txt,2024318,
+Annals / Histories (selections),Tacitus,no,,History,Public Domain,manual,,,,,
+Apology / Phaedo / Republic / Symposium / Meno / Gorgias / Theaetetus,Plato,yes,,Philosophy,Public Domain,gutenberg,1497,https://www.gutenberg.org/cache/epub/1497/pg1497.txt,Plato - Apology Phaedo Republic Symposium Meno Gorgias Theaetetus.txt,1238673,INCOMPLETE: PG 1497 contains ONLY the Republic despite omnibus title. 8640 lines of Jowett's Introduction. Need separate sources for other dialogues.
+Areopagitica,John Milton,yes,,Essays,Public Domain,gutenberg,608,https://www.gutenberg.org/cache/epub/608/pg608.txt,John Milton - Areopagitica.txt,123097,
+Bantu Philosophy,Placide Tempels,no,,Philosophy/African,Public Domain (cyrho.com),manual,,,,,
+Beowulf (Old English),—,yes,,Oral/Nonstandard,Public Domain,gutenberg,16328,https://www.gutenberg.org/cache/epub/16328/pg16328.txt,Beowulf (Old English).txt,299830,
+Beyond Good and Evil,Friedrich Nietzsche,yes,,Philosophy,Public Domain,gutenberg,4363,https://www.gutenberg.org/cache/epub/4363/pg4363.txt,Friedrich Nietzsche - Beyond Good and Evil.txt,408873,
+Bhagavad Gita,—,yes,,Sacred/Wisdom,Public Domain,gutenberg,2388,https://www.gutenberg.org/cache/epub/2388/pg2388.txt,Bhagavad Gita.txt,147382,
+Billy Budd,Herman Melville,yes,,Fiction,Public Domain,gutenberg,76513,https://www.gutenberg.org/cache/epub/76513/pg76513.txt,Herman Melville - Billy Budd.txt,726531,WRONG: PG 21422 is Avancini's Italian novella. Find correct Billy Budd ID.
+Book of Job,—,no,,Sacred/Wisdom,Public Domain (KJV),manual,,,,,
+Candide,Voltaire,yes,,Fiction,Public Domain,gutenberg,19942,https://www.gutenberg.org/cache/epub/19942/pg19942.txt,Voltaire - Candide.txt,229567,
+Civil Disobedience / Walden,Henry David Thoreau,yes,,Essays,Public Domain,gutenberg,205,https://www.gutenberg.org/cache/epub/205/pg205.txt,Henry David Thoreau - Civil Disobedience Walden.txt,664803,
+Common Sense,Thomas Paine,yes,,Essays,Public Domain,gutenberg,147,https://www.gutenberg.org/cache/epub/147/pg147.txt,Thomas Paine - Common Sense.txt,148424,
+Complete Poems,Emily Dickinson,yes,,Poetry,Public Domain,gutenberg,12242,https://www.gutenberg.org/cache/epub/12242/pg12242.txt,Emily Dickinson - Complete Poems.txt,206712,
+Computing Machinery and Intelligence (1950),Alan Turing,no,,Science,Free (UMBC PDF),manual,,,,,
+Concerning the Spiritual in Art,Wassily Kandinsky,yes,,Art/Philosophy,Public Domain,gutenberg,5321,https://www.gutenberg.org/cache/epub/5321/pg5321.txt,Wassily Kandinsky - Concerning the Spiritual in Art.txt,180127,
+Confessions,Augustine,yes,,Philosophy,Public Domain,gutenberg,3296,https://www.gutenberg.org/cache/epub/3296/pg3296.txt,Augustine - Confessions.txt,632064,
+Coyote Tales (selected),—,no,,Fables/Children's,Public Domain (traditional),manual,,,,,
+Crime and Punishment,Fyodor Dostoevsky,yes,,Fiction,Public Domain,gutenberg,2554,https://www.gutenberg.org/cache/epub/2554/pg2554.txt,Fyodor Dostoevsky - Crime and Punishment.txt,1176912,
+Critique of Pure Reason (selections),Immanuel Kant,yes,,Philosophy,Public Domain,gutenberg,4280,https://www.gutenberg.org/cache/epub/4280/pg4280.txt,Immanuel Kant - Critique of Pure Reason (selections).txt,1310583,
+De Architectura (Ten Books on Architecture),Vitruvius,no,,Craft/Design,Public Domain,manual,,,,,
+Death and the King's Horseman,Wole Soyinka,no,,Drama/African,Public Domain (jpellegrino PDF),manual,,,,,
+Democracy in America (selections),Alexis de Tocqueville,yes,,Essays,Public Domain,gutenberg,815,https://www.gutenberg.org/cache/epub/815/pg815.txt,Alexis de Tocqueville - Democracy in America (selections).txt,1148561,
+Demons (The Possessed),Fyodor Dostoevsky,yes,,Fiction,Public Domain,gutenberg,8117,https://www.gutenberg.org/cache/epub/8117/pg8117.txt,Fyodor Dostoevsky - Demons (The Possessed).txt,1482666,
+Dhammapada,—,yes,,Contemplative,Public Domain,gutenberg,2017,https://www.gutenberg.org/cache/epub/2017/pg2017.txt,Dhammapada.txt,88515,
+Diamond Sutra,—,no,,Contemplative,Public Domain,manual,,,,,
+Divine Comedy,Dante,yes,,Poetry/Epic,Public Domain,gutenberg,8800,https://www.gutenberg.org/cache/epub/8800/pg8800.txt,Dante - Divine Comedy.txt,639978,
+Don Quixote,Miguel de Cervantes,yes,,Fiction,Public Domain,gutenberg,996,https://www.gutenberg.org/cache/epub/996/pg996.txt,Miguel de Cervantes - Don Quixote.txt,2361875,
+Dubliners,James Joyce,yes,,Fiction,Public Domain,gutenberg,2814,https://www.gutenberg.org/cache/epub/2814/pg2814.txt,James Joyce - Dubliners.txt,397354,
+Ecce Homo,Friedrich Nietzsche,yes,,Philosophy,Public Domain,gutenberg,52190,https://www.gutenberg.org/cache/epub/52190/pg52190.txt,Friedrich Nietzsche - Ecce Homo.txt,303488,
+Ecclesiastes,—,no,,Sacred/Wisdom,Public Domain (KJV),manual,,,,,
+Either/Or (selections),Søren Kierkegaard,no,,Philosophy,Public Domain,manual,,,,,
+Elements (selections),Euclid,no,,Mathematics,Public Domain,manual,,,,,
+Essays,Michel de Montaigne,yes,,Philosophy,Public Domain,gutenberg,3600,https://www.gutenberg.org/cache/epub/3600/pg3600.txt,Michel de Montaigne - Essays.txt,3086108,
+Fear and Trembling,Søren Kierkegaard,no,,Philosophy,Public Domain,manual,,,,,
+Flatland,Edwin Abbott,yes,,Candidates,Public Domain,gutenberg,97,https://www.gutenberg.org/cache/epub/97/pg97.txt,Edwin Abbott - Flatland.txt,217417,
+Four Books of Architecture,Andrea Palladio,no,,Craft/Design,Public Domain,manual,,,,,
+Frankenstein,Mary Shelley,yes,,Fiction,Public Domain,gutenberg,84,https://www.gutenberg.org/cache/epub/84/pg84.txt,Mary Shelley - Frankenstein.txt,446583,
+Fusus al-Hikam (The Bezels of Wisdom),Ibn Arabi,no,,Philosophy/Islamic,Public Domain,manual,,,,,
+Genesis 1-11,—,no,,Sacred/Wisdom,Public Domain (KJV),manual,,,,,
+Gospel of Mark,—,no,,Sacred/Wisdom,Public Domain (KJV),manual,,,,,
+Grimm's Fairy Tales,Brothers Grimm,yes,,Fables/Children's,Public Domain,gutenberg,2591,https://www.gutenberg.org/cache/epub/2591/pg2591.txt,Brothers Grimm - Grimm's Fairy Tales.txt,549777,
+Gulliver's Travels,Jonathan Swift,yes,,Fiction,Public Domain,gutenberg,829,https://www.gutenberg.org/cache/epub/829/pg829.txt,Jonathan Swift - Gulliver's Travels.txt,611782,
+Hamlet,Shakespeare,yes,,Drama,Public Domain,gutenberg,1524,https://www.gutenberg.org/cache/epub/1524/pg1524.txt,Shakespeare - Hamlet.txt,204288,
+Heart Sutra,—,no,,Contemplative,Public Domain,manual,,,,,
+Heart of Darkness,Joseph Conrad,yes,,Fiction,Public Domain,gutenberg,219,https://www.gutenberg.org/cache/epub/219/pg219.txt,Joseph Conrad - Heart of Darkness.txt,232925,
+Histories (selections),Herodotus,yes,,History,Public Domain,gutenberg,2131,https://www.gutenberg.org/cache/epub/2131/pg2131.txt,Herodotus - Histories (selections).txt,224334,PG 2131 is 'An Account of Egypt' (Book II only). May want broader selections.
+History of the Peloponnesian War,Thucydides,yes,,History,Public Domain,gutenberg,7142,https://www.gutenberg.org/cache/epub/7142/pg7142.txt,Thucydides - History of the Peloponnesian War.txt,1215693,
+Hōjōki (An Account of My Hut),Kamo no Chōmei,no,,Philosophy/Japanese,Public Domain (Columbia),manual,,,,,
+Il Libro dell'Arte (The Craftsman's Handbook),Cennino Cennini,no,,Craft/Design,Public Domain,manual,,,,,
+Jane Eyre,Charlotte Brontë,yes,,Fiction,Public Domain,gutenberg,1260,https://www.gutenberg.org/cache/epub/1260/pg1260.txt,Charlotte Brontë - Jane Eyre.txt,1063116,
+Jataka Tales (selected),—,no,,Fables/Children's,Public Domain,manual,,,,,
+Kalevala,Elias Lönnrot (compiled),yes,,Oral/Nonstandard,Public Domain,gutenberg,5186,https://www.gutenberg.org/cache/epub/5186/pg5186.txt,Elias Lönnrot (compiled) - Kalevala.txt,862181,
+King Lear,Shakespeare,yes,,Drama,Public Domain,gutenberg,1532,https://www.gutenberg.org/cache/epub/1532/pg1532.txt,Shakespeare - King Lear.txt,181173,
+Le Guide Culinaire,Auguste Escoffier,no,,Craft/Instructional,Public Domain,manual,,,,,
+Leaves of Grass (1855 edition),Walt Whitman,yes,,Poetry,Public Domain,gutenberg,1322,https://www.gutenberg.org/cache/epub/1322/pg1322.txt,Walt Whitman - Leaves of Grass (1855 edition).txt,775575,
+Letters,John Keats,yes,,Essays/Letters,Public Domain,gutenberg,35698,https://www.gutenberg.org/cache/epub/35698/pg35698.txt,John Keats - Letters.txt,826171,
+Letters to Lucilius (selected),Seneca,no,,Philosophy,Public Domain,manual,,,,,
+Letters to a Young Poet,Rainer Maria Rilke,wrong_file,,Essays/Letters,Public Domain,gutenberg,69620,https://www.gutenberg.org/cache/epub/69620/pg69620.txt,Rainer Maria Rilke - Letters to a Young Poet.txt,1749000,WRONG: PG 69620 is American Literature anthology. Find correct Rilke ID or source manually.
+Leviathan (selections),Thomas Hobbes,yes,,Philosophy,Public Domain,gutenberg,3207,https://www.gutenberg.org/cache/epub/3207/pg3207.txt,Thomas Hobbes - Leviathan (selections).txt,1254733,
+Macbeth,Shakespeare,yes,,Drama,Public Domain,gutenberg,1533,https://www.gutenberg.org/cache/epub/1533/pg1533.txt,Shakespeare - Macbeth.txt,128341,
+Mechanics (Course of Theoretical Physics Vol. 1),Landau & Lifshitz,no,,Science,Archive.org,manual,,,,,
+Medea / The Bacchae,Euripides,no,,Drama,Public Domain,manual,,,,,
+Meditations,Marcus Aurelius,yes,,Philosophy,Public Domain,gutenberg,2680,https://www.gutenberg.org/cache/epub/2680/pg2680.txt,Marcus Aurelius - Meditations.txt,424724,
+Meditations on First Philosophy,René Descartes,yes,,Philosophy,Public Domain,gutenberg,59,https://www.gutenberg.org/cache/epub/59/pg59.txt,René Descartes - Meditations on First Philosophy.txt,150478,MISNAMED: PG 59 is 'Discourse on the Method' not 'Meditations'. Rename or find Meditations separately.
+Meister Eckhart: Sermons (selected),Meister Eckhart,no,,Contemplative,Public Domain,manual,,,,,
+Metamorphoses,Ovid,yes,,Poetry/Epic,Public Domain,gutenberg,21765,https://www.gutenberg.org/cache/epub/21765/pg21765.txt,Ovid - Metamorphoses.txt,773072,
+Metamorphosis,Franz Kafka,yes,,Fiction,Public Domain,gutenberg,5200,https://www.gutenberg.org/cache/epub/5200/pg5200.txt,Franz Kafka - Metamorphosis.txt,140566,
+Middlemarch,George Eliot,yes,,Fiction,Public Domain,gutenberg,145,https://www.gutenberg.org/cache/epub/145/pg145.txt,George Eliot - Middlemarch.txt,1833071,
+Moby-Dick,Herman Melville,yes,,Fiction,Public Domain,gutenberg,2701,https://www.gutenberg.org/cache/epub/2701/pg2701.txt,Herman Melville - Moby-Dick.txt,1260594,
+Molecular Structure of Nucleic Acids (1953),Watson & Crick,no,,Science,Free online,manual,,,,,
+Muqaddimah,Ibn Khaldun,no,,Philosophy/Islamic,Public Domain,manual,,,,,
+Mūlamadhyamakakārikā (Fundamental Verses on the Middle Way),Nagarjuna,no,,Philosophy/Indian,Public Domain,manual,,,,,
+Narrative of the Life of Frederick Douglass,Frederick Douglass,yes,,Essays/Memoir,Public Domain,gutenberg,23,https://www.gutenberg.org/cache/epub/23/pg23.txt,Frederick Douglass - Narrative of the Life of Frederick Douglass.txt,247586,
+Nicomachean Ethics,Aristotle,yes,,Philosophy,Public Domain,gutenberg,8438,https://www.gutenberg.org/cache/epub/8438/pg8438.txt,Aristotle - Nicomachean Ethics.txt,668359,
+Notebooks (selected),Leonardo da Vinci,no,,Craft/Design,Public Domain,manual,,,,,
+Notes from Underground,Fyodor Dostoevsky,yes,,Fiction,Public Domain,gutenberg,600,https://www.gutenberg.org/cache/epub/600/pg600.txt,Fyodor Dostoevsky - Notes from Underground.txt,263946,
+Nyaya Sutras (with Vatsyayana commentary),Gautama,no,,Philosophy/Indian,Public Domain,manual,,,,,
+Oedipus Rex / Antigone,Sophocles,no,,Drama,Public Domain,manual,,,,,
+Oku no Hosomichi (The Narrow Road to the Deep North),Matsuo Bashō,no,,Poetry/Japanese,Public Domain,manual,,,,,
+On Formally Undecidable Propositions,Kurt Gödel,no,,Mathematics,Public Domain,manual,,,,,
+On Growth and Form (1917),D'Arcy Wentworth Thompson,yes,,Science,Public Domain (Gutenberg),gutenberg,55264,https://www.gutenberg.org/cache/epub/55264/pg55264.txt,D'Arcy Wentworth Thompson - On Growth and Form (1917).txt,1721385,
+On Liberty,John Stuart Mill,yes,,Philosophy,Public Domain,gutenberg,34901,https://www.gutenberg.org/cache/epub/34901/pg34901.txt,John Stuart Mill - On Liberty.txt,331014,
+On the Electrodynamics of Moving Bodies (1905),Albert Einstein,no,,Science,Free (Wikisource),manual,,,,,
+On the Genealogy of Morality,Friedrich Nietzsche,yes,,Philosophy,Public Domain,gutenberg,52319,https://www.gutenberg.org/cache/epub/52319/pg52319.txt,Friedrich Nietzsche - On the Genealogy of Morality.txt,358072,
+On the Origin of Species (1859),Charles Darwin,yes,,Science,Public Domain (Gutenberg),gutenberg,1228,https://www.gutenberg.org/cache/epub/1228/pg1228.txt,Charles Darwin - On the Origin of Species (1859).txt,969008,
+On the Shortness of Life,Seneca,no,,Essays,Public Domain,manual,,,,,
+Othello,Shakespeare,yes,,Drama,Public Domain,gutenberg,1531,https://www.gutenberg.org/cache/epub/1531/pg1531.txt,Shakespeare - Othello.txt,180207,
+Panchatantra,Vishnu Sharma,no,,Fables/Children's,Public Domain,manual,,,,,
+Paradise Lost,John Milton,yes,,Poetry,Public Domain,gutenberg,26,https://www.gutenberg.org/cache/epub/26/pg26.txt,John Milton - Paradise Lost.txt,489805,
+Parallel Lives (selected),Plutarch,no,,Poetry/Biography,Public Domain,manual,,,,,
+Pensées,Blaise Pascal,yes,,Philosophy,Public Domain,gutenberg,18269,https://www.gutenberg.org/cache/epub/18269/pg18269.txt,Blaise Pascal - Pensées.txt,662862,
+Persuasion,Jane Austen,yes,,Fiction,Public Domain,gutenberg,105,https://www.gutenberg.org/cache/epub/105/pg105.txt,Jane Austen - Persuasion.txt,492873,
+Phenomenology of Spirit (Preface),G.W.F. Hegel,no,,Philosophy,Public Domain,manual,,,,,
+Platform Sutra,Huineng,no,,Contemplative,Public Domain,manual,,,,,
+Poetics,Aristotle,yes,,Philosophy,Public Domain,gutenberg,1974,https://www.gutenberg.org/cache/epub/1974/pg1974.txt,Aristotle - Poetics.txt,108411,
+Popol Vuh,—,no,,Oral/Nonstandard,Public Domain,manual,,,,,
+Pride and Prejudice,Jane Austen,yes,,Fiction,Public Domain,gutenberg,1342,https://www.gutenberg.org/cache/epub/1342/pg1342.txt,Jane Austen - Pride and Prejudice.txt,763083,
+Principia Mathematica (selections),Russell & Whitehead,no,,Mathematics,Public Domain,manual,,,,,
+Psalms (selected),—,no,,Sacred/Wisdom,Public Domain (KJV),manual,,,,,
+Rumi: Selected Poems,Jalal al-Din Rumi,no,,Contemplative,Public Domain,manual,,,,,
+Satires,Juvenal,yes,,Poetry,Public Domain,gutenberg,50657,https://www.gutenberg.org/cache/epub/50657/pg50657.txt,Juvenal - Satires.txt,1561329,
+Second Inaugural / Gettysburg / House Divided,Abraham Lincoln,no,,Essays/Speech,Public Domain,manual,,,,,
+Selected Koans (Mumonkan / Blue Cliff Record),—,no,,Contemplative,Public Domain,manual,,,,,
+Selected Opinions,Benjamin Cardozo,no,,Legal,Public Domain (gov't),manual,,,,,
+Selected Opinions,Learned Hand,no,,Legal,Public Domain (gov't),manual,,,,,
+Selected Opinions,Oliver Wendell Holmes Jr.,no,,Legal,Public Domain (gov't),manual,,,,,
+Selected Poems,George Herbert,no,,Poetry,Public Domain,manual,,,,,
+Selected Poems,Gerard Manley Hopkins,no,,Poetry,Public Domain,manual,,,,,
+Selected Poems,John Donne,no,,Poetry,Public Domain,manual,,,,,
+Selected Poems,W.B. Yeats,no,,Poetry,Public Domain (pre-1928),manual,,,,,
+Selected Poems,William Blake,no,,Poetry,Public Domain,manual,,,,,
+Selected Stories,Edgar Allan Poe,no,,Fiction,Public Domain,manual,,,,,
+Self-Reliance / Experience,Ralph Waldo Emerson,yes,,Essays,Public Domain,gutenberg,16643,https://www.gutenberg.org/cache/epub/16643/pg16643.txt,Ralph Waldo Emerson - Self-Reliance Experience.txt,567284,PG 16643 is full Essays collection (American Scholar + many others). Self-Reliance at line ~1998. May need extraction of specific essays.
+Siddhartha,Hermann Hesse,yes,,Fiction,Public Domain,gutenberg,2500,https://www.gutenberg.org/cache/epub/2500/pg2500.txt,Hermann Hesse - Siddhartha.txt,239818,
+Sir Gawain and the Green Knight (Middle English),—,yes,,Oral/Nonstandard,Public Domain,gutenberg,66084,https://www.gutenberg.org/cache/epub/66084/pg66084.txt,Sir Gawain and the Green Knight (Middle English).txt,142027,MISNAMED: PG 66084 is Weston's 1898 prose retelling not Middle English original. Usable but rename.
+Song of Solomon,—,no,,Sacred/Wisdom,Public Domain (KJV),manual,,,,,
+Sonnets,Shakespeare,yes,,Poetry,Public Domain,gutenberg,1041,https://www.gutenberg.org/cache/epub/1041/pg1041.txt,Shakespeare - Sonnets.txt,118547,
+Sonnets to Orpheus / Duino Elegies,Rainer Maria Rilke,no,,Poetry,Public Domain (German),manual,,,,,
+Stories (selected),Anton Chekhov,no,,Fiction,Public Domain,manual,,,,,
+Strange Case of Dr Jekyll and Mr Hyde,R.L. Stevenson,yes,,Fiction,Public Domain,gutenberg,43,https://www.gutenberg.org/cache/epub/43/pg43.txt,R.L. Stevenson - Strange Case of Dr Jekyll and Mr Hyde.txt,161124,
+Summa Theologiae (selections),Thomas Aquinas,no,,Philosophy,Public Domain,manual,,,,,
+Tahafut al-Falasifa (The Incoherence of the Philosophers),Al-Ghazali,no,,Philosophy/Islamic,Public Domain,manual,,,,,
+Tahafut al-Tahafut (The Incoherence of the Incoherence),Ibn Rushd (Averroes),no,,Philosophy/Islamic,Public Domain,manual,,,,,
+Tao Te Ching,Laozi,yes,,Philosophy,Public Domain,gutenberg,216,https://www.gutenberg.org/cache/epub/216/pg216.txt,Laozi - Tao Te Ching.txt,80449,
+The Analects,Confucius,yes,,Sacred/Wisdom,Public Domain,gutenberg,4094,https://www.gutenberg.org/cache/epub/4094/pg4094.txt,Confucius - The Analects.txt,221340,
+The Art of War,Sun Tzu,yes,,Candidates,Public Domain,gutenberg,132,https://www.gutenberg.org/cache/epub/132/pg132.txt,Sun Tzu - The Art of War.txt,339290,
+The Autobiography of Benjamin Franklin,Benjamin Franklin,yes,,Essays/Memoir,Public Domain,gutenberg,148,https://www.gutenberg.org/cache/epub/148/pg148.txt,Benjamin Franklin - The Autobiography of Benjamin Franklin.txt,404564,
+The Book of Five Rings,Miyamoto Musashi,wrong_file,,Craft/Design,Public Domain,gutenberg,55802,https://www.gutenberg.org/cache/epub/55802/pg55802.txt,Miyamoto Musashi - The Book of Five Rings.txt,393079,WRONG: PG 55802 is Hearn's 'Out of the East'. Book of Five Rings likely not on Gutenberg — source manually.
+The Book of Tea,Kakuzō Okakura,yes,,Craft/Design,Public Domain,gutenberg,769,https://www.gutenberg.org/cache/epub/769/pg769.txt,Kakuzō Okakura - The Book of Tea.txt,126567,
+The Brothers Karamazov,Fyodor Dostoevsky,yes,,Fiction,Public Domain,gutenberg,28054,https://www.gutenberg.org/cache/epub/28054/pg28054.txt,Fyodor Dostoevsky - The Brothers Karamazov.txt,1992279,
+The Canterbury Tales (Middle English),Geoffrey Chaucer,yes,,Oral/Nonstandard,Public Domain,gutenberg,2383,https://www.gutenberg.org/cache/epub/2383/pg2383.txt,Geoffrey Chaucer - The Canterbury Tales (Middle English).txt,1706924,
+The Castle,Franz Kafka,wrong_file,,Fiction,Public Domain,gutenberg,14858,https://www.gutenberg.org/cache/epub/14858/pg14858.txt,Franz Kafka - The Castle.txt,478925,WRONG: PG 14858 is Comstock's 'The Man Thou Gavest'. Find correct Kafka Castle ID.
+The Chemical History of a Candle (1861),Michael Faraday,yes,,Science,Public Domain (Gutenberg),gutenberg,14474,https://www.gutenberg.org/cache/epub/14474/pg14474.txt,Michael Faraday - The Chemical History of a Candle (1861).txt,245897,
+The Cherry Orchard,Anton Chekhov,no,,Drama,Public Domain,manual,,,,,
+The Cloud of Unknowing,Anonymous,no,,Contemplative,Public Domain,manual,,,,,
+The Common Law,Oliver Wendell Holmes Jr.,yes,,Legal,Public Domain,gutenberg,2449,https://www.gutenberg.org/cache/epub/2449/pg2449.txt,Oliver Wendell Holmes Jr. - The Common Law.txt,764980,
+The Communist Manifesto,Karl Marx & Friedrich Engels,yes,,Social Science,Public Domain,gutenberg,61,https://www.gutenberg.org/cache/epub/61/pg61.txt,Karl Marx & Friedrich Engels - The Communist Manifesto.txt,94044,
+The Death of Ivan Ilyich,Leo Tolstoy,wrong_file,,Fiction,Public Domain,gutenberg,927,https://www.gutenberg.org/cache/epub/927/pg927.txt,Leo Tolstoy - The Death of Ivan Ilyich.txt,59908,WRONG: PG 927 is Dickens' 'The Lamplighter'. Find correct Tolstoy ID.
+The Decline and Fall of the Roman Empire (selections),Edward Gibbon,yes,,History,Public Domain,gutenberg,25717,https://www.gutenberg.org/cache/epub/25717/pg25717.txt,Edward Gibbon - The Decline and Fall of the Roman Empire (selections).txt,10683350,
+The Discourses,Epictetus,yes,,Philosophy,Public Domain,gutenberg,10661,https://www.gutenberg.org/cache/epub/10661/pg10661.txt,Epictetus - The Discourses.txt,351001,
+The Epic of Gilgamesh,—,yes,,Oral/Nonstandard,Public Domain,gutenberg,11000,https://www.gutenberg.org/cache/epub/11000/pg11000.txt,The Epic of Gilgamesh.txt,251916,WRONG: PG 74882 is Finnish novel by Viebig. Gilgamesh may not be on Gutenberg — try sacred-texts.com or archive.org.
+The Feynman Lectures on Physics (1964),Richard Feynman,no,,Science,Free (online),manual,,,,,
+The Fundamental Principles of the Metaphysic of Morals,Immanuel Kant,yes,,Philosophy,Public Domain,gutenberg,5682,https://www.gutenberg.org/cache/epub/5682/pg5682.txt,Immanuel Kant - The Fundamental Principles of the Metaphysic of Morals.txt,199705,
+The Gay Science,Friedrich Nietzsche,yes,,Philosophy,Public Domain,gutenberg,52881,https://www.gutenberg.org/cache/epub/52881/pg52881.txt,Friedrich Nietzsche - The Gay Science.txt,563151,
+The Great Gatsby,F. Scott Fitzgerald,yes,,Fiction,Public Domain (2021),gutenberg,64317,https://www.gutenberg.org/cache/epub/64317/pg64317.txt,F. Scott Fitzgerald - The Great Gatsby.txt,296858,
+The Idiot,Fyodor Dostoevsky,yes,,Fiction,Public Domain,gutenberg,2638,https://www.gutenberg.org/cache/epub/2638/pg2638.txt,Fyodor Dostoevsky - The Idiot.txt,1394550,
+The Iliad,Homer,yes,,Poetry/Epic,Public Domain,gutenberg,6130,https://www.gutenberg.org/cache/epub/6130/pg6130.txt,Homer - The Iliad.txt,1142889,
+The Interpretation of Dreams,Sigmund Freud,yes,,Psychology,Public Domain,gutenberg,38219,https://www.gutenberg.org/cache/epub/38219/pg38219.txt,Sigmund Freud - The Interpretation of Dreams.txt,974006,MISNAMED: PG 38219 is 'A General Introduction to Psychoanalysis' not 'Interpretation of Dreams'. Rename or find correct work.
+The Mabinogion,—,no,,Oral/Nonstandard,Public Domain,manual,,,,,
+The Odyssey,Homer,yes,,Poetry/Epic,Public Domain,gutenberg,1727,https://www.gutenberg.org/cache/epub/1727/pg1727.txt,Homer - The Odyssey.txt,710364,
+The Oresteia,Aeschylus,no,,Drama,Public Domain,manual,,,,,
+The Philosophy of Composition,Edgar Allan Poe,yes,,Fiction/Essay,Public Domain,gutenberg,55749,https://www.gutenberg.org/cache/epub/55749/pg55749.txt,Edgar Allan Poe - The Philosophy of Composition.txt,58667,
+The Physiology of Taste,Jean Anthelme Brillat-Savarin,yes,,Craft/Instructional,Public Domain,gutenberg,5434,https://www.gutenberg.org/cache/epub/5434/pg5434.txt,Jean Anthelme Brillat-Savarin - The Physiology of Taste.txt,429807,
+The Prince,Niccolò Machiavelli,yes,,History/Philosophy,Public Domain,gutenberg,1232,https://www.gutenberg.org/cache/epub/1232/pg1232.txt,Niccolò Machiavelli - The Prince.txt,307128,
+The Principles of Quantum Mechanics (1930),P.A.M. Dirac,no,,Science,Archive.org,manual,,,,,
+The Prose Edda / Poetic Edda,Snorri Sturluson / —,yes,,Oral/Nonstandard,Public Domain,gutenberg,14726,https://www.gutenberg.org/cache/epub/14726/pg14726.txt,Snorri Sturluson — - The Prose Edda Poetic Edda.txt,526604,
+The Protestant Ethic and the Spirit of Capitalism,Max Weber,wrong_file,,Social Science,Public Domain,gutenberg,46773,https://www.gutenberg.org/cache/epub/46773/pg46773.txt,Max Weber - The Protestant Ethic and the Spirit of Capitalism.txt,209626,WRONG: PG 46773 is Bastianelli's Italian music book. Weber's Protestant Ethic may not be on Gutenberg — check archive.org.
+The Sickness Unto Death,Søren Kierkegaard,wrong_file,,Philosophy,Public Domain,gutenberg,44305,https://www.gutenberg.org/cache/epub/44305/pg44305.txt,Søren Kierkegaard - The Sickness Unto Death.txt,256144,WRONG: PG 44305 is Spanish novel 'El Mulato Plácido'. Kierkegaard may not be on Gutenberg — check archive.org.
+The Social Contract,Jean-Jacques Rousseau,yes,,Philosophy,Public Domain,gutenberg,46333,https://www.gutenberg.org/cache/epub/46333/pg46333.txt,Jean-Jacques Rousseau - The Social Contract.txt,741715,
+The Souls of Black Folk,W.E.B. Du Bois,yes,,Essays/Social Science,Public Domain,gutenberg,408,https://www.gutenberg.org/cache/epub/408/pg408.txt,W.E.B. Du Bois - The Souls of Black Folk.txt,425403,
+The Tale of Genji,Murasaki Shikibu,yes,,Fiction/Japanese,Public Domain (Waley trans.),gutenberg,66057,https://www.gutenberg.org/cache/epub/66057/pg66057.txt,Murasaki Shikibu - The Tale of Genji.txt,566347,
+The Tempest,Shakespeare,yes,,Drama,Public Domain,gutenberg,23042,https://www.gutenberg.org/cache/epub/23042/pg23042.txt,Shakespeare - The Tempest.txt,172243,
+The Tortoise and the Hare and Other Aesopic Fables from Africa,—,no,,Fables/Children's,Public Domain (traditional),manual,,,,,
+The Trial,Franz Kafka,yes,,Fiction,Public Domain,gutenberg,7849,https://www.gutenberg.org/cache/epub/7849/pg7849.txt,Franz Kafka - The Trial.txt,476605,
+The Turn of the Screw,Henry James,yes,,Fiction,Public Domain,gutenberg,209,https://www.gutenberg.org/cache/epub/209/pg209.txt,Henry James - The Turn of the Screw.txt,252691,
+The Upanishads (selected),—,no,,Contemplative,Public Domain,manual,,,,,
+The Varieties of Religious Experience,William James,yes,,Philosophy/Psychology,Public Domain,gutenberg,621,https://www.gutenberg.org/cache/epub/621/pg621.txt,William James - The Varieties of Religious Experience.txt,1155101,
+The Velveteen Rabbit,Margery Williams,yes,,Fables/Children's,Public Domain,gutenberg,11757,https://www.gutenberg.org/cache/epub/11757/pg11757.txt,Margery Williams - The Velveteen Rabbit.txt,42077,
+The Voyage of the Beagle (1839),Charles Darwin,yes,,Science,Public Domain (Gutenberg),gutenberg,944,https://www.gutenberg.org/cache/epub/944/pg944.txt,Charles Darwin - The Voyage of the Beagle (1839).txt,1227242,
+The Way of Chuang Tzu,Zhuangzi,no,,Contemplative,Public Domain,manual,,,,,
+The Wealth of Nations (selections),Adam Smith,yes,,Social Science,Public Domain,gutenberg,3300,https://www.gutenberg.org/cache/epub/3300/pg3300.txt,Adam Smith - The Wealth of Nations (selections).txt,2467653,
+Three Sisters / Uncle Vanya / The Seagull,Anton Chekhov,no,,Drama,Public Domain,manual,,,,,
+Thus Spoke Zarathustra,Friedrich Nietzsche,yes,,Philosophy,Public Domain,gutenberg,1998,https://www.gutenberg.org/cache/epub/1998/pg1998.txt,Friedrich Nietzsche - Thus Spoke Zarathustra.txt,672792,
+Tractatus Logico-Philosophicus,Ludwig Wittgenstein,no,,Philosophy,Public Domain,manual,,,,,
+Tsurezuregusa (Essays in Idleness),Yoshida Kenkō,no,,Philosophy/Japanese,Public Domain,manual,,,,,
+Two Treatises of Government,John Locke,yes,,Philosophy,Public Domain,gutenberg,7370,https://www.gutenberg.org/cache/epub/7370/pg7370.txt,John Locke - Two Treatises of Government.txt,338549,
+Uncle Remus / Br'er Rabbit Stories,Joel Chandler Harris (recorded),no,,Fables/Children's,Public Domain,manual,,,,,
+War and Peace,Leo Tolstoy,yes,,Fiction,Public Domain,gutenberg,2600,https://www.gutenberg.org/cache/epub/2600/pg2600.txt,Leo Tolstoy - War and Peace.txt,3293656,
+What Is Life? (1944),Erwin Schrödinger,no,,Science,Archive.org,manual,,,,,
+Winnie-the-Pooh,A.A. Milne,yes,,Fables/Children's,Public Domain (2022),gutenberg,67098,https://www.gutenberg.org/cache/epub/67098/pg67098.txt,A.A. Milne - Winnie-the-Pooh.txt,153038,
+Wuthering Heights,Emily Brontë,yes,,Fiction,Public Domain,gutenberg,768,https://www.gutenberg.org/cache/epub/768/pg768.txt,Emily Brontë - Wuthering Heights.txt,677618,
+Adventures of Huckleberry Finn,Mark Twain,yes,,Fiction,Public Domain,gutenberg,76,https://www.gutenberg.org/cache/epub/76/pg76.txt,Mark Twain - Adventures of Huckleberry Finn.txt,622463,Comedy/voice. Vernacular coherence.
+Apologia Pro Vita Sua,John Henry Newman,yes,,Theology,Public Domain,gutenberg,19690,https://www.gutenberg.org/cache/epub/19690/pg19690.txt,John Henry Newman - Apologia Pro Vita Sua.txt,794467,Finest Victorian prose. Theology as autobiography.
+Concerning Christian Liberty,Martin Luther,yes,,Theology,Public Domain,gutenberg,1911,https://www.gutenberg.org/cache/epub/1911/pg1911.txt,Martin Luther - Concerning Christian Liberty.txt,121405,Also: 95 Theses (PG 274). Core Reformation theology.
+Dark Night of the Soul,John of the Cross,no,,Contemplative,Public Domain,manual,,,,,"Not on Gutenberg. Check archive.org for public domain translation. Mystical theology, extraordinary poetry."
+De Profundis,Oscar Wilde,yes,,Essays/Letters,Public Domain,gutenberg,921,https://www.gutenberg.org/cache/epub/921/pg921.txt,Oscar Wilde - De Profundis.txt,115752,Letter from prison. Suffering as coherence.
+Dialogues Concerning Natural Religion,David Hume,yes,,Philosophy,Public Domain,gutenberg,4583,https://www.gutenberg.org/cache/epub/4583/pg4583.txt,David Hume - Dialogues Concerning Natural Religion.txt,236877,Philosophical dialogue form. Ideas emerging between positions.
+Dialogue Concerning the Two Chief World Systems,Galileo Galilei,no,,Science/Philosophy,Public Domain,manual,,,,,Not on Gutenberg. Archive.org has Salusbury/Drake translations. Dialogue form IS the argument.
+Elements of Chemistry,Antoine Lavoisier,yes,,Science/Chemistry,Public Domain,gutenberg,30775,https://www.gutenberg.org/cache/epub/30775/pg30775.txt,Antoine Lavoisier - Elements of Chemistry.txt,738273,Founded modern chemistry. Robert Kerr translation (1790).
+Enquiry into Plants (selections),Theophrastus,no,,Science/Botany,Public Domain,manual,,,,,Not on Gutenberg. Founding text of botany. Hort Loeb translation on archive.org.
+Historia Animalium,Aristotle,yes,,Science/Biology,Public Domain,gutenberg,59058,https://www.gutenberg.org/cache/epub/59058/pg59058.txt,Aristotle - Historia Animalium.txt,794914,D'Arcy Thompson translation (1910). Biology as philosophy.
+Institutes of the Christian Religion (selections),John Calvin,yes,,Theology,Public Domain,gutenberg,45001,https://www.gutenberg.org/cache/epub/45001/pg45001.txt,John Calvin - Institutes of the Christian Religion.txt,1925377,Vol. 1 of 2. John Allen translation. Vol. 2: PG 64392.
+Interior Castle,Teresa of Ávila,no,,Contemplative,Public Domain,manual,,,,,Not on Gutenberg. Archive.org has Benedictines of Stanbrook translation. Architectural metaphor IS the theology.
+Man's Place in Nature,Thomas Huxley,yes,,Science/Biology,Public Domain,gutenberg,2931,https://www.gutenberg.org/cache/epub/2931/pg2931.txt,Thomas Huxley - Man's Place in Nature.txt,121751,Best Victorian scientific prose. Also: essays at PG 40257.
+Maxims,La Rochefoucauld,yes,,Philosophy,Public Domain,gutenberg,9105,https://www.gutenberg.org/cache/epub/9105/pg9105.txt,La Rochefoucauld - Maxims.txt,232379,Sentence-level coherence. Aphoristic density.
+Micrographia,Robert Hooke,yes,,Science,Public Domain,gutenberg,15491,https://www.gutenberg.org/cache/epub/15491/pg15491.txt,Robert Hooke - Micrographia.txt,916509,Early microscopy. Observation as discovery. The flea and the cork cell.
+Natural History (selections),Pliny the Elder,yes,,Science/Natural History,Public Domain,gutenberg,57493,https://www.gutenberg.org/cache/epub/57493/pg57493.txt,Pliny the Elder - Natural History (selections).txt,1437451,Vol. 1 of 6. Bostock & Riley translation. Encyclopedia of the ancient world.
+On the Motion of the Heart and Blood,William Harvey,yes,,Science/Anatomy,Public Domain,gutenberg,67065,https://www.gutenberg.org/cache/epub/67065/pg67065.txt,William Harvey - On the Motion of the Heart and Blood.txt,467273,Discovery of circulation (1628). Argument from first principles.
+On the Nature of Things,Lucretius,yes,,Poetry/Science,Public Domain,gutenberg,785,https://www.gutenberg.org/cache/epub/785/pg785.txt,Lucretius - On the Nature of Things.txt,496564,Epicurean atomism as epic poem. Physics and poetry fused.
+On the Sensations of Tone,Hermann von Helmholtz,no,,Science/Music,Public Domain,manual,,,,,Not on Gutenberg. Ellis translation (1875) on archive.org. Physics of music — bridges the gap.
+Opticks,Isaac Newton,yes,,Science/Physics,Public Domain,gutenberg,33504,https://www.gutenberg.org/cache/epub/33504/pg33504.txt,Isaac Newton - Opticks.txt,596366,The Queries section is Newton speculating. Experimental physics as prose.
+Revelations of Divine Love,Julian of Norwich,yes,,Contemplative,Public Domain,gutenberg,52958,https://www.gutenberg.org/cache/epub/52958/pg52958.txt,Julian of Norwich - Revelations of Divine Love.txt,476103,First book in English by a woman. Extraordinary mystical vision.
+Science and Hypothesis,Henri Poincaré,yes,,Science/Mathematics,Public Domain,gutenberg,39713,https://www.gutenberg.org/cache/epub/39713/pg39713.txt,Henri Poincaré - Science and Hypothesis.txt,1205003,Mathematics as exposition. W.J. Greenstreet translation.
+Selected Sermons,Jonathan Edwards,yes,,Theology,Public Domain,gutenberg,34632,https://www.gutenberg.org/cache/epub/34632/pg34632.txt,Jonathan Edwards - Selected Sermons.txt,425331,"Sinners in the Hands of an Angry God, etc. Terrifying and beautiful."
+Tartuffe,Molière,yes,,Drama,Public Domain,gutenberg,2027,https://www.gutenberg.org/cache/epub/2027/pg2027.txt,Molière - Tartuffe.txt,130176,Comedy as structural coherence. Curtis Hidden Page translation.
+The Birds,Aristophanes,yes,,Drama,Public Domain,gutenberg,3013,https://www.gutenberg.org/cache/epub/3013/pg3013.txt,Aristophanes - The Birds.txt,145299,Ancient comedy. Nothing else in the corpus teaches this register.
+The Consolation of Philosophy,Boethius,yes,,Philosophy/Theology,Public Domain,gutenberg,14328,https://www.gutenberg.org/cache/epub/14328/pg14328.txt,Boethius - The Consolation of Philosophy.txt,275715,Prose-poem hybrid. Philosophy as consolation. H.R. James translation.
+The Frogs,Aristophanes,yes,,Drama,Public Domain,gutenberg,7998,https://www.gutenberg.org/cache/epub/7998/pg7998.txt,Aristophanes - The Frogs.txt,107606,Literary criticism as comedy. Aristophanes judges tragedy.
+The Importance of Being Earnest,Oscar Wilde,yes,,Drama,Public Domain,gutenberg,844,https://www.gutenberg.org/cache/epub/844/pg844.txt,Oscar Wilde - The Importance of Being Earnest.txt,141843,Perfect comic structure. Every line load-bearing.
+The Imitation of Christ,Thomas à Kempis,yes,,Contemplative,Public Domain,gutenberg,1653,https://www.gutenberg.org/cache/epub/1653/pg1653.txt,Thomas à Kempis - The Imitation of Christ.txt,374957,Most-read Christian devotional text after the Bible. William Benham translation.
+The Life and Opinions of Tristram Shandy,Laurence Sterne,yes,,Fiction,Public Domain,gutenberg,1079,https://www.gutenberg.org/cache/epub/1079/pg1079.txt,Laurence Sterne - The Life and Opinions of Tristram Shandy.txt,1114027,Metafiction. Structural play. The novel about writing a novel.
+The Life of the Spider,Jean-Henri Fabre,yes,,Science/Biology,Public Domain,gutenberg,1887,https://www.gutenberg.org/cache/epub/1887/pg1887.txt,Jean-Henri Fabre - The Life of the Spider.txt,432789,"The Virgil of insects. Also: Life of the Fly (3422), Social Life in the Insect World (18350)."
+The Natural History of Selborne,Gilbert White,yes,,Science/Natural History,Public Domain,gutenberg,1408,https://www.gutenberg.org/cache/epub/1408/pg1408.txt,Gilbert White - The Natural History of Selborne.txt,519460,Patient observation as form. The ur-text of natural history writing.
+The Pilgrim's Progress,John Bunyan,yes,,Fiction/Theology,Public Domain,gutenberg,131,https://www.gutenberg.org/cache/epub/131/pg131.txt,John Bunyan - The Pilgrim's Progress.txt,331512,Theology as allegory/narrative. Second most-read English book after the Bible.
+The Sceptical Chymist,Robert Boyle,yes,,Science/Chemistry,Public Domain,gutenberg,22914,https://www.gutenberg.org/cache/epub/22914/pg22914.txt,Robert Boyle - The Sceptical Chymist.txt,538052,Founded modern chemistry. Dialogue form.
+Theory of Colours,Goethe,yes,,Science/Art,Public Domain,gutenberg,50572,https://www.gutenberg.org/cache/epub/50572/pg50572.txt,Goethe - Theory of Colours.txt,607107,"Poet doing science. Eastlake translation (1840). Metamorphosis of Plants not on Gutenberg, but this bridges art and science."
+Three Dialogues Between Hylas and Philonous,George Berkeley,yes,,Philosophy,Public Domain,gutenberg,4724,https://www.gutenberg.org/cache/epub/4724/pg4724.txt,George Berkeley - Three Dialogues Between Hylas and Philonous.txt,230034,Philosophical dialogue form. Idealism argued through conversation.
+Two New Sciences,Galileo Galilei,no,,Science/Physics,Public Domain,manual,,,,,Not on Gutenberg. Crew & de Salvio translation on archive.org. Structural mechanics — literally about what holds things together.
+Views of Nature,Alexander von Humboldt,yes,,Science/Natural History,Public Domain,gutenberg,67684,https://www.gutenberg.org/cache/epub/67684/pg67684.txt,Alexander von Humboldt - Views of Nature.txt,1161346,"Also: Cosmos (PG 14565), Personal Narrative (PG 6322). The attempt to describe everything."
+On the Connexion of the Physical Sciences,Mary Somerville,yes,,Science/Physics,Public Domain,gutenberg,52869,https://www.gutenberg.org/cache/epub/52869/pg52869.txt,Mary Somerville - On the Connexion of the Physical Sciences.txt,1365355,First popular science book. The person for whom 'scientist' was coined.
+Book of Songs (Shijing),—,yes,,Poetry/Chinese,Public Domain,gutenberg,9394,https://www.gutenberg.org/cache/epub/9394/pg9394.txt,Book of Songs (Shijing).txt,332084,Legge translation (not Waley). Oldest Chinese poetry collection (11th-7th c. BCE). Foundation of the Chinese literary tradition.
+Romance of the Three Kingdoms (Vol. 1),Luo Guanzhong,yes,,Fiction/Chinese,Public Domain,gutenberg,77416,https://www.gutenberg.org/cache/epub/77416/pg77416.txt,Luo Guanzhong - Romance of the Three Kingdoms.txt,1658400,Brewitt-Taylor translation. Vol 1 of 2. Vol 2 not on Gutenberg (PG 71627 is wrong). Check archive.org.
+Dream of the Red Chamber (Vol. 1),Cao Xueqin,yes,,Fiction/Chinese,Public Domain,gutenberg,9603,https://www.gutenberg.org/cache/epub/9603/pg9603.txt,Cao Xueqin - Dream of the Red Chamber (Vol. 1).txt,1066289,Joly translation. Greatest Chinese novel. Vol 2: PG 9604.
+Dream of the Red Chamber (Vol. 2),Cao Xueqin,yes,,Fiction/Chinese,Public Domain,gutenberg,9604,https://www.gutenberg.org/cache/epub/9604/pg9604.txt,Cao Xueqin - Dream of the Red Chamber (Vol. 2).txt,1492301,Joly translation. Continuation.
+Strange Stories from a Chinese Studio,Pu Songling,yes,,Fiction/Chinese,Public Domain,gutenberg,43629,https://www.gutenberg.org/cache/epub/43629/pg43629.txt,Pu Songling - Strange Stories from a Chinese Studio.txt,1281006,Giles translation. Supernatural tales — structural variety and compression.
+A Hundred and Seventy Chinese Poems,— (trans. Arthur Waley),yes,,Poetry/Chinese,Public Domain,gutenberg,42290,https://www.gutenberg.org/cache/epub/42290/pg42290.txt,Arthur Waley - A Hundred and Seventy Chinese Poems.txt,227743,"Li Bai, Du Fu, Bai Juyi, Wang Wei, and others. Waley's landmark anthology."
+The Poet Li Po (A.D. 701-762),— (trans. Arthur Waley),yes,,Poetry/Chinese,Public Domain,gutenberg,43274,https://www.gutenberg.org/cache/epub/43274/pg43274.txt,Arthur Waley - The Poet Li Po.txt,74258,Waley's Li Bai focus. PG title: 'The Poet Li Po'.
+More Translations from the Chinese,— (trans. Arthur Waley),yes,,Poetry/Chinese,Public Domain,gutenberg,16500,https://www.gutenberg.org/cache/epub/16500/pg16500.txt,Arthur Waley - More Translations from the Chinese.txt,159566,"PG title: 'More Translations from the Chinese'. Bai Juyi focus, also Po Chü-i selections."
+Fir-Flower Tablets: Poems from the Chinese,Du Fu (trans. Florence Ayscough),yes,,Poetry/Chinese,Public Domain,gutenberg,48222,https://www.gutenberg.org/cache/epub/48222/pg48222.txt,Florence Ayscough - Fir-Flower Tablets.txt,362575,PG title: 'Fir-Flower Tablets'. Different translator from Waley — interesting to have both perspectives.
+I Ching (Book of Changes),—,no,,Sacred/Wisdom,Public Domain,manual,,,,,Legge translation. Sacred-texts.com. Foundation of Chinese cosmology and divination.
+Mencius,Mencius,no,,Philosophy/Chinese,Public Domain,manual,,,,,Legge translation. Archive.org. Second most important Confucian text after the Analects.
+Xunzi (selections),Xunzi,no,,Philosophy/Chinese,Public Domain,manual,,,,,Knoblock or Watson translation. Archive.org. Human nature is bad — the anti-Mencius.
+Han Feizi (selections),Han Feizi,no,,Philosophy/Chinese,Public Domain,manual,,,,,Liao translation. Archive.org. Legalism — power and governance.
+Mozi (selections),Mozi,no,,Philosophy/Chinese,Public Domain,manual,,,,,Mei translation. Archive.org. Universal love and anti-war philosophy.
+Lotus Sutra,—,no,,Sacred/Wisdom,Public Domain,manual,,,,,Kern translation. Sacred-texts.com. Central Mahayana Buddhist text.
+Summer on the Lakes,Margaret Fuller,yes,,Transcendentalist,Public Domain,gutenberg,11526,https://www.gutenberg.org/cache/epub/11526/pg11526.txt,Margaret Fuller - Summer on the Lakes.txt,408607,Observation as surrender to experience. Genre-defying travel/philosophy.
+Woman in the Nineteenth Century,Margaret Fuller,yes,,Transcendentalist/Essays,Public Domain,gutenberg,8642,https://www.gutenberg.org/cache/epub/8642/pg8642.txt,Margaret Fuller - Woman in the Nineteenth Century.txt,653966,IS about gender but transcendentalist and structurally important.
+Principles of Psychology (Vol. 1),William James,yes,,Philosophy/Psychology,Public Domain,gutenberg,57628,https://www.gutenberg.org/cache/epub/57628/pg57628.txt,William James - Principles of Psychology Vol. 1.txt,1698154,"Contains Ch. IX 'The Stream of Thought' — invented the concept. Extraordinary prose."
+Principles of Psychology (Vol. 2),William James,yes,,Philosophy/Psychology,Public Domain,gutenberg,57634,https://www.gutenberg.org/cache/epub/57634/pg57634.txt,William James - Principles of Psychology Vol. 2.txt,1704158,Continuation. Will/emotion/perception chapters.
+Creative Evolution,Henri Bergson,yes,,Philosophy,Public Domain,gutenberg,26163,https://www.gutenberg.org/cache/epub/26163/pg26163.txt,Henri Bergson - Creative Evolution.txt,868973,Duration and élan vital. Philosophy that captures flow rather than analyzing it. Mitchell translation.
+Time and Free Will,Henri Bergson,yes,,Philosophy,Public Domain,gutenberg,56852,https://www.gutenberg.org/cache/epub/56852/pg56852.txt,Henri Bergson - Time and Free Will.txt,419187,"Pure duration (durée). The most important text for 'flow of experience' as philosophical concept. Pogson translation."
+Tablets,Amos Bronson Alcott,yes,,Transcendentalist,Public Domain,gutenberg,36825,https://www.gutenberg.org/cache/epub/36825/pg36825.txt,Amos Bronson Alcott - Tablets.txt,250284,Aphoristic transcendentalism.
+Concord Days,Amos Bronson Alcott,yes,,Transcendentalist,Public Domain,gutenberg,46209,https://www.gutenberg.org/cache/epub/46209/pg46209.txt,Amos Bronson Alcott - Concord Days.txt,419075,Diary-form transcendentalism.
+"Speeches, Addresses, and Sermons (Vol. 1)",Theodore Parker,yes,,Theology/Transcendentalist,Public Domain,gutenberg,34573,https://www.gutenberg.org/cache/epub/34573/pg34573.txt,Theodore Parker - Speeches and Sermons Vol. 1.txt,623698,Key transcendentalist theologian. 'Transient and Permanent in Christianity' in his Discourse (archive.org).
+The Renaissance,Walter Pater,yes,,Essays/Art,Public Domain,gutenberg,2398,https://www.gutenberg.org/cache/epub/2398/pg2398.txt,Walter Pater - The Renaissance.txt,368670,"'Burn always with this hard gem-like flame.' Proto-stream-of-consciousness. The Conclusion is essential."
+Confessions of an English Opium-Eater,Thomas De Quincey,yes,,Essays/Memoir,Public Domain,gutenberg,2040,https://www.gutenberg.org/cache/epub/2040/pg2040.txt,Thomas De Quincey - Confessions of an English Opium-Eater.txt,242840,Flow of experience as literary form. Dream logic as prose structure.
+Chess Fundamentals,José Raúl Capablanca,yes,,Strategy/Chess,Public Domain,gutenberg,33870,https://www.gutenberg.org/cache/epub/33870/pg33870.txt,José Raúl Capablanca - Chess Fundamentals.txt,262990,Economy of thought. The simplest correct approach to positional evaluation.
+On War,Carl von Clausewitz,yes,,Strategy,Public Domain,gutenberg,1946,https://www.gutenberg.org/cache/epub/1946/pg1946.txt,Carl von Clausewitz - On War.txt,1736563,Strategic interdependence. Fog of war. J.J. Graham translation (1873).
+Common Sense in Chess,Emanuel Lasker,no,,Strategy/Chess,Public Domain,archive.org,,https://archive.org/details/commonsenseinche00laskrich,,,Structural evaluation as prose. 12 lectures from 1895. Archive.org PDF.
+"Theory of Games and Economic Behavior (selections)",Von Neumann & Morgenstern,no,,Strategy/Game Theory,Not PD,manual,,,,,Soren to source. Founded game theory (1944). Dense but structurally beautiful.
+"The Strategy of Conflict",Thomas Schelling,no,,Strategy/Game Theory,Not PD,manual,,,,,Soren to source. Most readable game theory. Focal points and credible commitment.
+My System,Aron Nimzowitsch,no,,Strategy/Chess,Not PD,manual,,,,,"Soren to source. Most important positional chess book. Blockade, overprotection, prophylaxis."
+"My 60 Memorable Games",Bobby Fischer,no,,Strategy/Chess,Not PD,manual,,,,,Soren to source. Game annotations as narrative. Each game a story.
+To the Lighthouse,Virginia Woolf,no,,Fiction,Not PD,manual,,,,,Soren to source. Time and perception as form.
+The Waves,Virginia Woolf,no,,Fiction,Not PD,manual,,,,,"Soren to source. Six voices, interludes. Most structurally radical novel in English."
+Orlando,Virginia Woolf,no,,Fiction,Not PD,manual,,,,,Soren to source. Gender as structural play.
+Three Lives,Gertrude Stein,yes,,Fiction,Public Domain,gutenberg,15408,https://www.gutenberg.org/cache/epub/15408/pg15408.txt,Gertrude Stein - Three Lives.txt,476000,Repetitive prose as form. Language as the subject.
+Tender Buttons,Gertrude Stein,yes,,Poetry/Experimental,Public Domain,gutenberg,15396,https://www.gutenberg.org/cache/epub/15396/pg15396.txt,Gertrude Stein - Tender Buttons.txt,101926,Verbal cubism. Objects/Food/Rooms.
+Nightwood,Djuna Barnes,no,,Fiction,Not PD,manual,,,,,Soren to source. Incantatory prose. T.S. Eliot wrote the introduction.
+Their Eyes Were Watching God,Zora Neale Hurston,no,,Fiction,Not PD,manual,,,,,Soren to source. Vernacular as literary form.
+Complete Stories,Flannery O'Connor,no,,Fiction,Not PD,manual,,,,,Soren to source. Violence and grace. Every story is a machine.
+The Passion According to G.H.,Clarice Lispector,no,,Fiction,Not PD,manual,,,,,Soren to source. Consciousness eating itself.
+The Left Hand of Darkness,Ursula K. Le Guin,no,,Fiction,Not PD,manual,,,,,Soren to source. Gender dissolved entirely.
+Housekeeping,Marilynne Robinson,no,,Fiction,Not PD,manual,,,,,Soren to source. Landscape and transience.
+Song of Solomon,Toni Morrison,no,,Fiction,Not PD,manual,,,,,Soren to source. Myth operating inside realism.
+Autobiography of Red,Anne Carson,no,,Poetry/Fiction,Not PD,manual,,,,,Soren to source. Genre-dissolving. A monster trying to hold together.
+The Alexiad,Anna Comnena,no,,History,Public Domain,manual,,,,,Archive.org (Dawes translation). Princess writing military history. 12th century.
+O Pioneers!,Willa Cather,yes,,Fiction,Public Domain,gutenberg,24,https://www.gutenberg.org/cache/epub/24/pg24.txt,Cather - O Pioneers.txt,331245,Landscape and settlement.
+The Awakening,Kate Chopin,yes,,Fiction,Public Domain,gutenberg,160,https://www.gutenberg.org/cache/epub/160/pg160.txt,Chopin - The Awakening.txt,392869,Includes selected short stories. Consciousness and desire.
+The Age of Innocence,Edith Wharton,yes,,Fiction,Public Domain,gutenberg,541,https://www.gutenberg.org/cache/epub/541/pg541.txt,Wharton - The Age of Innocence.txt,609885,Social architecture.
+The Country of the Pointed Firs,Sarah Orne Jewett,yes,,Fiction,Public Domain,gutenberg,367,https://www.gutenberg.org/cache/epub/367/pg367.txt,Jewett - The Country of the Pointed Firs.txt,254785,Observation as form.
+The House of Mirth,Edith Wharton,yes,,Fiction,Public Domain,gutenberg,284,https://www.gutenberg.org/cache/epub/284/pg284.txt,Wharton - The House of Mirth.txt,777960,Social exclusion and complicity.
+Oroonoko,Aphra Behn,yes,,Fiction,Public Domain,gutenberg,29854,https://www.gutenberg.org/cache/epub/29854/pg29854.txt,Behn - Oroonoko (Works Vol V).txt,1027835,In The Works of Aphra Behn Volume V (PG 29854). Early proto-novel. Slavery and nobility.
+Mrs Dalloway,Virginia Woolf,yes,,Fiction,Public Domain (2021),gutenberg,71865,https://www.gutenberg.org/cache/epub/71865/pg71865.txt,Virginia Woolf - Mrs Dalloway.txt,390387,Consciousness rendered as prose structure.
+My Ántonia,Willa Cather,yes,,Fiction,Public Domain,gutenberg,19810,https://www.gutenberg.org/cache/epub/19810/pg19810.txt,Willa Cather - My Ántonia.txt,477347,Landscape as memory. Companion to O Pioneers!
+The Pillow Book (partial),Sei Shōnagon,yes,,Essays/Japanese,Public Domain,gutenberg,76016,https://www.gutenberg.org/cache/epub/76016/pg76016.txt,Sei Shōnagon - The Pillow Book.txt,202692,"Waley 1928 translation (~25% of full text). Lists, observations, aesthetic judgments."
+Journals (Vol. 1),Dorothy Wordsworth,yes,,Essays/Observation,Public Domain,gutenberg,42856,https://www.gutenberg.org/cache/epub/42856/pg42856.txt,Dorothy Wordsworth - Journals Vol. 1.txt,507051,"Alfoxden + Grasmere journals. The raw observation William turned into poetry. She saw it first, more precisely."
+Indiana,George Sand,yes,,Fiction,Public Domain,gutenberg,63445,https://www.gutenberg.org/cache/epub/63445/pg63445.txt,George Sand - Indiana.txt,596505,Sand's debut novel. Ives translation.
+"Civilisation: Its Cause and Cure",Edward Carpenter,yes,,Philosophy,Public Domain,gutenberg,44094,https://www.gutenberg.org/cache/epub/44094/pg44094.txt,Edward Carpenter - Civilisation Its Cause and Cure.txt,472431,Queer Victorian polymath. Essays on society and nature.
+Hauntings,Vernon Lee,yes,,Fiction,Public Domain,gutenberg,9956,https://www.gutenberg.org/cache/epub/9956/pg9956.txt,Vernon Lee - Hauntings.txt,345703,Supernatural fiction. Vernon Lee = Violet Paget. Aesthetic prose.
+The Wind in the Willows,Kenneth Grahame,yes,,Children's,Public Domain,gutenberg,289,,Kenneth Grahame - Wind in the Willows.txt,,
+The Jungle Book,Rudyard Kipling,yes,,Children's,Public Domain,gutenberg,236,,Rudyard Kipling - The Jungle Book.txt,,
+Just So Stories,Rudyard Kipling,yes,,Children's,Public Domain,gutenberg,2781,,Rudyard Kipling - Just So Stories.txt,,
+Treasure Island,R.L. Stevenson,yes,,Children's,Public Domain,gutenberg,120,,R.L. Stevenson - Treasure Island.txt,,
+Peter Pan,J.M. Barrie,yes,,Children's,Public Domain,gutenberg,16,,J.M. Barrie - Peter Pan.txt,,
+The Secret Garden,Frances Hodgson Burnett,yes,,Children's,Public Domain,gutenberg,113,,Frances Hodgson Burnett - The Secret Garden.txt,,
+A Little Princess,Frances Hodgson Burnett,yes,,Children's,Public Domain,gutenberg,146,,Frances Hodgson Burnett - A Little Princess.txt,,
+The Princess and the Goblin,George MacDonald,yes,,Children's,Public Domain,gutenberg,708,,George MacDonald - The Princess and the Goblin.txt,,
+At the Back of the North Wind,George MacDonald,yes,,Children's,Public Domain,gutenberg,225,,George MacDonald - At the Back of the North Wind.txt,,
+Pinocchio,Carlo Collodi,yes,,Children's,Public Domain,gutenberg,500,,Carlo Collodi - Pinocchio.txt,,
+Anne of Green Gables,L.M. Montgomery,yes,,Children's,Public Domain,gutenberg,45,,L.M. Montgomery - Anne of Green Gables.txt,,
+Black Beauty,Anna Sewell,yes,,Children's,Public Domain,gutenberg,271,,Anna Sewell - Black Beauty.txt,,
+The Call of the Wild,Jack London,yes,,Fiction,Public Domain,gutenberg,215,,Jack London - Call of the Wild.txt,,
+White Fang,Jack London,yes,,Fiction,Public Domain,gutenberg,910,,Jack London - White Fang.txt,,
+The Time Machine,H.G. Wells,yes,,Fiction,Public Domain,gutenberg,35,,H.G. Wells - The Time Machine.txt,,
+Kim,Rudyard Kipling,yes,,Fiction,Public Domain,gutenberg,2226,,Rudyard Kipling - Kim.txt,,
+Kidnapped,R.L. Stevenson,yes,,Fiction,Public Domain,gutenberg,421,,R.L. Stevenson - Kidnapped.txt,,
+The Wonderful Wizard of Oz,L. Frank Baum,yes,,Children's,Public Domain,gutenberg,55,,L. Frank Baum - The Wonderful Wizard of Oz.txt,,
+The Railway Children,E. Nesbit,yes,,Children's,Public Domain,gutenberg,1874,,E. Nesbit - The Railway Children.txt,,
+Robinson Crusoe,Daniel Defoe,yes,,Fiction,Public Domain,gutenberg,521,,Daniel Defoe - Robinson Crusoe.txt,,
+The Water-Babies,Charles Kingsley,yes,,Children's,Public Domain,gutenberg,4159,,Charles Kingsley - The Water-Babies.txt,,
+Alice's Adventures in Wonderland,Lewis Carroll,yes,,Children's,Public Domain,gutenberg,11,,Lewis Carroll - Alice in Wonderland.txt,,
+Through the Looking-Glass,Lewis Carroll,yes,,Children's,Public Domain,gutenberg,12,,Lewis Carroll - Through the Looking-Glass.txt,,
+The Velveteen Rabbit,Margery Williams,yes,,Children's,Public Domain,gutenberg,11757,,Margery Williams - The Velveteen Rabbit.txt,,
+Winnie-the-Pooh,A.A. Milne,yes,,Children's,Public Domain,gutenberg,67098,,A.A. Milne - Winnie-the-Pooh.txt,,
+Webster's Unabridged Dictionary 1913,Noah Webster,yes,,Reference/Dictionary,Public Domain,gutenberg,29765,,Webster - Unabridged Dictionary 1913.txt,,
+English Words with Latin and Greek Roots,Various,yes,,Reference/Etymology,Public Domain,gutenberg,49010,,English Words with Latin and Greek Roots.txt,,
+The Greek Anthology (selections),Various,yes,,Poetry,Public Domain,gutenberg,28296,,Greek Anthology Vol 1.txt,,
+The Narrow Road to the Deep North,Matsuo Basho,yes,,Poetry,Public Domain,gutenberg,2875,,Basho - Narrow Road to the Deep North.txt,,
+Rubaiyat of Omar Khayyam,Omar Khayyam (trans. Fitzgerald),yes,,Poetry,Public Domain,gutenberg,246,,Rubaiyat of Omar Khayyam.txt,,
+Flatland,Edwin Abbott,yes,,Fiction/Mathematics,Public Domain,gutenberg,201,,Edwin Abbott - Flatland.txt,,
+The Art of War,Sun Tzu,yes,,Philosophy/Strategy,Public Domain,gutenberg,132,,Sun Tzu - The Art of War.txt,,
+Pedagogy of the Oppressed,Paulo Freire,yes,,Philosophy/Education,PDF extraction,,,,"Paulo Freire - Pedagogy of the Oppressed.txt",,30th Anniversary Edition

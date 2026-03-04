@@ -1,0 +1,19 @@
+# Corpus data (too large for GitHub — synced via Drive)
+cleaned/
+raw/
+tokenized/
+checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.eggs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/

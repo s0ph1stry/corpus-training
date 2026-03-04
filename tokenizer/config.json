@@ -1,0 +1,20 @@
+{
+  "vocab_size": 16000,
+  "special_tokens": [
+    "<pad>",
+    "<bos>",
+    "<eos>",
+    "<mask>",
+    "<sep>",
+    "<corrupt>",
+    "<unk>"
+  ],
+  "min_frequency": 2,
+  "num_training_files": 177,
+  "training_size_bytes": 117012702,
+  "model_type": "BPE",
+  "embedding_factored": true,
+  "embedding_inner_dim": 64,
+  "embedding_dim": 256,
+  "bpe_dropout": 0.1
+}
