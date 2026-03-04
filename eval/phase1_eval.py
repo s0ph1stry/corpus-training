@@ -96,17 +96,18 @@ def reconstruction_accuracy(model, config, project_dir, device,
 
             with torch.no_grad():
                 output = model(
-                    decoder_input_ids=dec_target,
+                    decoder_input_ids=enc_input,
                     encoder_input_ids=enc_input,
                     encoder_available=enc_avail,
                 )
                 logits = output['logits']
 
-                # Token accuracy
+                # Token accuracy at MASKED positions only
                 preds = logits.argmax(dim=-1)  # (1, seq_len)
-                mask = dec_target != pad_id
-                correct += (preds == dec_target).masked_select(mask).sum().item()
-                total += mask.sum().item()
+                masked_positions = (enc_input == tokenizer.token_to_id('<mask>'))
+                if masked_positions.any():
+                    correct += (preds == dec_target).masked_select(masked_positions).sum().item()
+                    total += masked_positions.sum().item()
 
                 # Loss
                 loss = F.cross_entropy(
@@ -193,7 +194,7 @@ def loss_by_corruption_strategy(model, config, project_dir, device,
 
             with torch.no_grad():
                 output = model(
-                    decoder_input_ids=dec_target,
+                    decoder_input_ids=enc_input,
                     encoder_input_ids=enc_input,
                     encoder_available=enc_avail,
                 )

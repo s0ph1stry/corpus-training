@@ -7,6 +7,7 @@ wandb logging for loss, aux_loss, routing stats, corruption rate, grad norm.
 Includes online difficulty adjustment feedback to the dataset.
 """
 
+import contextlib
 import math
 import time
 from pathlib import Path
@@ -133,6 +134,12 @@ class Trainer:
                 },
             )
 
+        # Automatic mixed precision (significant speedup on CUDA)
+        self.use_amp = self.device.type == 'cuda'
+        if self.use_amp:
+            self.scaler = torch.amp.GradScaler('cuda')
+            print("  AMP enabled (float16 on CUDA)")
+
         # Checkpoint dir
         self.ckpt_dir = self.project_dir / 'checkpoints' / phase
         self.ckpt_dir.mkdir(parents=True, exist_ok=True)
@@ -160,40 +167,49 @@ class Trainer:
 
         decoder_padding_mask = batch['decoder_padding_mask'].to(self.device)
 
-        # Forward
-        output = self.model(
-            decoder_input_ids=decoder_input_ids,
-            encoder_input_ids=encoder_input_ids,
-            encoder_available=encoder_available,
-            decoder_padding_mask=decoder_padding_mask,
-            encoder_padding_mask=encoder_padding_mask,
-        )
+        # Forward (with AMP autocast on CUDA)
+        amp_ctx = torch.amp.autocast('cuda') if self.use_amp else contextlib.nullcontext()
+        with amp_ctx:
+            output = self.model(
+                decoder_input_ids=decoder_input_ids,
+                encoder_input_ids=encoder_input_ids,
+                encoder_available=encoder_available,
+                decoder_padding_mask=decoder_padding_mask,
+                encoder_padding_mask=encoder_padding_mask,
+            )
 
-        logits = output['logits']
-        aux_loss = output['aux_loss']
+            logits = output['logits']
+            aux_loss = output['aux_loss']
 
-        # Compute task loss
-        if self.phase == 'phase1':
-            task_loss = reconstruction_loss(logits, decoder_targets,
-                                            pad_id=self.config.pad_token_id)
-        else:
-            loss_dict = phase2_mixed_loss(logits, decoder_targets,
-                                          encoder_available,
-                                          pad_id=self.config.pad_token_id)
-            task_loss = loss_dict['loss']
+            # Compute task loss
+            if self.phase == 'phase1':
+                task_loss = reconstruction_loss(logits, decoder_targets,
+                                                pad_id=self.config.pad_token_id)
+            else:
+                loss_dict = phase2_mixed_loss(logits, decoder_targets,
+                                              encoder_available,
+                                              pad_id=self.config.pad_token_id)
+                task_loss = loss_dict['loss']
 
-        total_loss = task_loss + aux_loss
+            total_loss = task_loss + aux_loss
 
         # Backward
         self.optimizer.zero_grad()
-        total_loss.backward()
+        if self.use_amp:
+            self.scaler.scale(total_loss).backward()
+            self.scaler.unscale_(self.optimizer)
+            grad_norm = nn.utils.clip_grad_norm_(
+                self.model.parameters(), self.grad_clip
+            )
+            self.scaler.step(self.optimizer)
+            self.scaler.update()
+        else:
+            total_loss.backward()
+            grad_norm = nn.utils.clip_grad_norm_(
+                self.model.parameters(), self.grad_clip
+            )
+            self.optimizer.step()
 
-        # Gradient clipping
-        grad_norm = nn.utils.clip_grad_norm_(
-            self.model.parameters(), self.grad_clip
-        )
-
-        self.optimizer.step()
         self.scheduler.step()
 
         self.global_step += 1
@@ -280,6 +296,8 @@ class Trainer:
             'config': self.config.__dict__,
             'entropy_history': self.model.moe_manager.entropy_history,
         }
+        if self.use_amp:
+            ckpt['scaler_state_dict'] = self.scaler.state_dict()
         if extra:
             ckpt.update(extra)
 
@@ -298,6 +316,8 @@ class Trainer:
         self.optimizer.load_state_dict(ckpt['optimizer_state_dict'])
         self.scheduler.load_state_dict(ckpt['scheduler_state_dict'])
         self.global_step = ckpt['global_step']
+        if self.use_amp and 'scaler_state_dict' in ckpt:
+            self.scaler.load_state_dict(ckpt['scaler_state_dict'])
         print(f"  Loaded checkpoint from step {self.global_step}")
 
     def get_routing_stats(self) -> dict:

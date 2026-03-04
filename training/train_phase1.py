@@ -119,7 +119,8 @@ def main():
                 break
 
             # Router collapse mitigation: force some batches to no-encoder
-            if random.random() < args.collapse_mitigation_rate:
+            is_mitigation_batch = random.random() < args.collapse_mitigation_rate
+            if is_mitigation_batch:
                 batch['encoder_available'] = torch.zeros_like(batch['encoder_available'])
                 batch['encoder_input_ids'] = None
                 batch['encoder_padding_mask'] = None
@@ -130,9 +131,11 @@ def main():
             # Train step
             result = trainer.train_step(batch)
 
-            # Online difficulty adjustment
-            for name, loss in result['per_text_loss'].items():
-                dataset.update_online_difficulty(name, loss)
+            # Online difficulty adjustment (skip mitigation batches — inflated loss
+            # would distort sampling weights)
+            if not is_mitigation_batch:
+                for name, loss in result['per_text_loss'].items():
+                    dataset.update_online_difficulty(name, loss)
 
             # Logging
             trainer.log(result)

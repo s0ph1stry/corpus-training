@@ -53,16 +53,16 @@ def compute_perplexity(model: HeteroMoETransformer,
             if start == 0:
                 n_tokens = end - start - 1
             else:
-                n_tokens = min(stride, end - start - 1)
-                # Only count the non-overlapping portion
+                # Recompute loss for non-overlapping portion only
                 loss_per_token = torch.nn.functional.cross_entropy(
                     logits.view(-1, V), target_ids.view(-1), reduction='none'
                 )
-                # Take loss from the stride portion only
                 overlap = (end - start - 1) - stride
                 if overlap > 0:
                     loss = loss_per_token[overlap:].sum()
                     n_tokens = len(loss_per_token) - overlap
+                else:
+                    n_tokens = end - start - 1
 
             total_nll += loss.item()
             total_tokens += n_tokens

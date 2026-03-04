@@ -36,8 +36,7 @@ class ModelConfig:
 
     # MoE
     n_experts: int = 2  # total experts per MoE layer
-    n_type_a: int = 1  # encoder-decoder experts
-    n_type_b: int = 1  # decoder-only experts
+    n_type_a: int = 1  # encoder-decoder experts (n_type_b = n_experts - n_type_a)
     top_k: int = 1
     capacity_factor_train: float = 1.25
     capacity_factor_eval: float = 2.0
@@ -154,7 +153,6 @@ def TinyConfig(**overrides) -> ModelConfig:
         n_dec_layers=4,
         n_experts=2,
         n_type_a=1,
-        n_type_b=1,
         top_k=1,
         context_len=512,
         dropout=0.1,
@@ -179,7 +177,6 @@ def SmallConfig(**overrides) -> ModelConfig:
         n_dec_layers=8,
         n_experts=4,
         n_type_a=1,
-        n_type_b=3,
         top_k=2,
         context_len=1024,
         dropout=0.1,

@@ -124,12 +124,19 @@ def compute_per_text_loss(logits: torch.Tensor, targets: torch.Tensor,
     per_sample_mean = (per_sample_loss * valid.float()).sum(dim=1) / valid.float().sum(dim=1).clamp(min=1)
 
     result = {}
+    counts = {}
     for i, name in enumerate(text_names):
         if name:
             loss_val = per_sample_mean[i].item()
             if name in result:
-                result[name] = (result[name] + loss_val) / 2
+                result[name] += loss_val
+                counts[name] += 1
             else:
                 result[name] = loss_val
+                counts[name] = 1
+
+    # Compute proper mean
+    for name in result:
+        result[name] /= counts[name]
 
     return result

@@ -162,14 +162,16 @@ class EncoderDecoderExpert(nn.Module):
                 encoder_mask: torch.Tensor = None) -> torch.Tensor:
         """
         x: (n_tokens, d_model) — dispatched tokens
-        encoder_out: (n_tokens, enc_seq_len, d_model)
-        encoder_mask: (n_tokens, enc_seq_len)
+
+        Returns DELTA only (no residual). The MoE dispatch layer adds the residual.
         """
-        # Cross-attention with residual
-        x = x + self.cross_attn(self.cross_attn_norm(x), encoder_out, encoder_mask)
-        # FFN with residual
-        x = x + self.ffn(self.ffn_norm(x))
-        return x
+        # Cross-attention delta
+        ca = self.cross_attn(self.cross_attn_norm(x), encoder_out, encoder_mask)
+        # FFN needs the cross-attended representation
+        h = x + ca
+        ff = self.ffn(self.ffn_norm(h))
+        # Return delta only: ca + ff (dispatch adds x back via outer residual)
+        return ca + ff
 
 
 class DecoderOnlyExpert(nn.Module):
@@ -185,9 +187,11 @@ class DecoderOnlyExpert(nn.Module):
         self.ffn = ExpertFFN(config)
 
     def forward(self, x: torch.Tensor, **kwargs) -> torch.Tensor:
-        """x: (n_tokens, d_model) — dispatched tokens. Extra kwargs ignored."""
-        x = x + self.ffn(self.ffn_norm(x))
-        return x
+        """x: (n_tokens, d_model) — dispatched tokens. Extra kwargs ignored.
+
+        Returns DELTA only (no residual). The MoE dispatch layer adds the residual.
+        """
+        return self.ffn(self.ffn_norm(x))
 
 
 class Router(nn.Module):
@@ -291,8 +295,9 @@ class MOEManager:
         """
         probs = F.softmax(router_logits.float(), dim=-1)
 
-        # f_i: fraction of tokens dispatched to each expert
-        one_hot = F.one_hot(expert_indices[:, 0], n_experts).float()
+        # f_i: fraction of tokens dispatched to each expert (all top-k slots)
+        dispatched = expert_indices.reshape(-1)
+        one_hot = F.one_hot(dispatched, n_experts).float()
         f = one_hot.mean(dim=0)
 
         # P_i: average probability assigned to each expert

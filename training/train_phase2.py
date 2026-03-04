@@ -101,11 +101,12 @@ def main():
     print()
 
     while trainer.global_step < args.total_steps:
-        loader.set_step(trainer.global_step)
         for batch in loader:
             if trainer.global_step >= args.total_steps:
                 break
 
+            # Update step per-batch for corruption schedule consistency
+            loader.set_step(trainer.global_step)
             result = trainer.train_step(batch)
 
             # Online difficulty adjustment

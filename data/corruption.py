@@ -85,28 +85,14 @@ def span_mask(token_ids: List[int], rate: float = 0.15,
                 total_masked += 1
         attempts += 1
 
-    # Build corrupted sequence: replace masked spans with single <mask>
-    corrupted = []
-    targets = []
-    in_span = False
-
-    for i, tid in enumerate(token_ids):
+    # Build corrupted sequence: replace each masked token with <mask> in-place.
+    # Preserves sequence length for position-aligned reconstruction.
+    corrupted = list(token_ids)
+    for i in range(n):
         if masked[i]:
-            if not in_span:
-                corrupted.append(MASK_ID)
-                targets.append(PAD_ID)  # alignment padding for the mask token
-                in_span = True
-            # Target gets the original token
-            # (stored separately, not aligned 1:1 with corrupted)
-        else:
-            corrupted.append(tid)
-            targets.append(PAD_ID)
-            in_span = False
+            corrupted[i] = MASK_ID
 
-    # Build target sequence: just the masked tokens in order
-    masked_tokens = [tid for i, tid in enumerate(token_ids) if masked[i]]
-
-    return corrupted, masked_tokens
+    return corrupted, list(token_ids)
 
 
 def sentence_shuffle(token_ids: List[int], tokenizer,
@@ -149,26 +135,28 @@ def sentence_shuffle(token_ids: List[int], tokenizer,
 
 
 def span_deletion(token_ids: List[int], rate: float = 0.15,
-                  avg_span_length: int = 3) -> Tuple[List[int], List[int]]:
+                  avg_span_length: int = 3,
+                  vocab_size: int = 16233) -> Tuple[List[int], List[int]]:
     """
-    Like span_mask but the mask token is omitted entirely.
-    The model must figure out that something is missing and what it was.
-    Harder than span_mask — used later in training.
+    Random token noise injection — harder than span_mask.
+    Replaces spans with random vocabulary tokens instead of <mask>.
+    The model must detect corrupted tokens without an explicit marker.
+    Preserves sequence length for position-aligned reconstruction.
 
-    Returns (corrupted_ids, deleted_tokens).
+    Returns (corrupted_ids, original_ids).
     """
     if not token_ids or rate <= 0:
-        return list(token_ids), []
+        return list(token_ids), list(token_ids)
 
     n = len(token_ids)
-    n_to_delete = max(1, int(n * rate))
+    n_to_corrupt = max(1, int(n * rate))
 
-    # Generate spans to delete
-    deleted = [False] * n
-    total_deleted = 0
+    # Generate spans to corrupt
+    corrupted_mask = [False] * n
+    total_corrupted = 0
     attempts = 0
 
-    while total_deleted < n_to_delete and attempts < n * 3:
+    while total_corrupted < n_to_corrupt and attempts < n * 3:
         start = random.randint(0, n - 1)
         span_len = min(
             random.choices(
@@ -181,15 +169,18 @@ def span_deletion(token_ids: List[int], rate: float = 0.15,
         )
 
         for i in range(start, min(start + span_len, n)):
-            if not deleted[i]:
-                deleted[i] = True
-                total_deleted += 1
+            if not corrupted_mask[i]:
+                corrupted_mask[i] = True
+                total_corrupted += 1
         attempts += 1
 
-    corrupted = [tid for i, tid in enumerate(token_ids) if not deleted[i]]
-    deleted_tokens = [tid for i, tid in enumerate(token_ids) if deleted[i]]
+    # Replace corrupted positions with random tokens (skip special token range 0-9)
+    corrupted = list(token_ids)
+    for i in range(n):
+        if corrupted_mask[i]:
+            corrupted[i] = random.randint(10, vocab_size - 1)
 
-    return corrupted, deleted_tokens
+    return corrupted, list(token_ids)
 
 
 def cross_text_insert(token_ids: List[int],

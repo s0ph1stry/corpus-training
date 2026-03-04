@@ -59,17 +59,13 @@ class MoELayer(nn.Module):
                 encoder_out: torch.Tensor = None,
                 encoder_mask: torch.Tensor = None,
                 padding_mask: torch.Tensor = None,
-                encoder_available: torch.Tensor = None,
-                batch_encoder_out: torch.Tensor = None,
-                batch_encoder_mask: torch.Tensor = None) -> torch.Tensor:
+                encoder_available: torch.Tensor = None) -> torch.Tensor:
         """
         x: (batch, seq_len, d_model)
         encoder_out: (batch, enc_seq_len, d_model) or None
         encoder_mask: (batch, enc_seq_len) or None
         padding_mask: (batch, seq_len) — True=valid, False=pad
         encoder_available: (batch,) — binary per sample
-        batch_encoder_out: same as encoder_out (alias)
-        batch_encoder_mask: same as encoder_mask (alias)
 
         Returns: (batch, seq_len, d_model)
         """
@@ -120,9 +116,6 @@ class MoELayer(nn.Module):
                 token_mask = expert_indices[:, k] == expert_idx
                 token_positions = token_mask.nonzero(as_tuple=True)[0]
                 if len(token_positions) > 0:
-                    # Enforce capacity
-                    if len(token_positions) > capacity:
-                        token_positions = token_positions[:capacity]
                     entry = expert_to_tokens.setdefault(expert_idx, {'positions': [], 'slots': []})
                     entry['positions'].append(token_positions)
                     entry['slots'].append(torch.full_like(token_positions, k))
@@ -131,6 +124,11 @@ class MoELayer(nn.Module):
         for expert_idx, token_info in expert_to_tokens.items():
             all_positions = torch.cat(token_info['positions'])
             all_slots = torch.cat(token_info['slots'])
+
+            # Enforce capacity across all top-k slots combined
+            if len(all_positions) > capacity:
+                all_positions = all_positions[:capacity]
+                all_slots = all_slots[:capacity]
 
             tokens = x_flat[all_positions]  # (n_selected, D)
             weights = expert_weights[all_positions, all_slots].unsqueeze(-1)
