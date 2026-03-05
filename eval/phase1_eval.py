@@ -22,6 +22,7 @@ from model.model import HeteroMoETransformer
 from model.config import ModelConfig
 from data.corruption import (
     init_special_tokens, apply_corruption,
+    MODE_R_ID, MODE_S_ID, MODE_X_ID,
 )
 from eval.routing_analysis import RoutingTracker, compute_routing_entropy
 
@@ -82,15 +83,20 @@ def reconstruction_accuracy(model, config, project_dir, device,
             )
             corrupted = result['corrupted_ids']
 
+            # Prepend R-mode token (denoising eval = R-mode)
+            mode_token = MODE_R_ID
+            corrupted_with_mode = [mode_token] + corrupted[:config.context_len - 1]
+            window_with_mode = [mode_token] + window[:config.context_len - 1]
+
             # Pad
             def pad(ids, length):
                 if len(ids) >= length:
                     return ids[:length]
                 return ids + [pad_id] * (length - len(ids))
 
-            enc_input = torch.tensor([pad(corrupted, config.context_len)],
+            enc_input = torch.tensor([pad(corrupted_with_mode, config.context_len)],
                                      dtype=torch.long, device=device)
-            dec_target = torch.tensor([pad(window, config.context_len)],
+            dec_target = torch.tensor([pad(window_with_mode, config.context_len)],
                                       dtype=torch.long, device=device)
             enc_avail = torch.tensor([1.0], device=device)
 
@@ -181,14 +187,18 @@ def loss_by_corruption_strategy(model, config, project_dir, device,
             )
             corrupted = result['corrupted_ids']
 
+            # Prepend R-mode token for standard strategies
+            corrupted_with_mode = [MODE_R_ID] + corrupted[:config.context_len - 1]
+            window_with_mode = [MODE_R_ID] + window[:config.context_len - 1]
+
             def pad(ids, length):
                 if len(ids) >= length:
                     return ids[:length]
                 return ids + [pad_id] * (length - len(ids))
 
-            enc_input = torch.tensor([pad(corrupted, config.context_len)],
+            enc_input = torch.tensor([pad(corrupted_with_mode, config.context_len)],
                                      dtype=torch.long, device=device)
-            dec_target = torch.tensor([pad(window, config.context_len)],
+            dec_target = torch.tensor([pad(window_with_mode, config.context_len)],
                                       dtype=torch.long, device=device)
             enc_avail = torch.tensor([1.0], device=device)
 
@@ -232,6 +242,8 @@ def routing_by_text(model, config, project_dir, device,
     with open(held_out_path) as f:
         held_out_names = json.load(f)
 
+    init_special_tokens(tokenizer)
+
     # Track per-text routing
     text_routing = {}
     tracker = RoutingTracker(model)
@@ -254,7 +266,9 @@ def routing_by_text(model, config, project_dir, device,
             for _ in range(n_windows):
                 start = rng.randint(0, len(ids) - config.context_len)
                 window = ids[start:start + config.context_len]
-                input_ids = torch.tensor([window], dtype=torch.long, device=device)
+                # Prepend R-mode token (denoising context for routing_by_text)
+                seq = [MODE_R_ID] + window[:config.context_len - 1]
+                input_ids = torch.tensor([seq], dtype=torch.long, device=device)
                 enc_avail = torch.tensor([1.0], device=device)
                 model(
                     decoder_input_ids=input_ids,
@@ -316,6 +330,7 @@ def loss_by_rubric_score(model, config, project_dir, device,
     if not tok_path.exists():
         tok_path = project_dir / 'tokenizer' / 'tokenizer.json'
     tokenizer = Tokenizer.from_file(str(tok_path))
+    init_special_tokens(tokenizer)
     bos_id = tokenizer.token_to_id('<bos>')
     eos_id = tokenizer.token_to_id('<eos>')
     pad_id = tokenizer.token_to_id('<pad>')
@@ -358,8 +373,10 @@ def loss_by_rubric_score(model, config, project_dir, device,
             for _ in range(n_windows):
                 start = rng.randint(0, len(ids) - config.context_len)
                 window = ids[start:start + config.context_len]
-                input_ids = torch.tensor([window[:-1]], dtype=torch.long, device=device)
-                targets = torch.tensor([window[1:]], dtype=torch.long, device=device)
+                # Prepend S-mode token (autoregressive eval)
+                seq = [MODE_S_ID] + window[:config.context_len - 1]
+                input_ids = torch.tensor([seq[:-1]], dtype=torch.long, device=device)
+                targets = torch.tensor([seq[1:]], dtype=torch.long, device=device)
 
                 output = model(decoder_input_ids=input_ids)
                 loss = F.cross_entropy(
@@ -416,6 +433,151 @@ def loss_by_rubric_score(model, config, project_dir, device,
     return {'per_text': results}
 
 
+def routing_by_ul2_mode(model, config, project_dir, device,
+                        n_samples=100, seed=42):
+    """Compare routing decisions across UL2 modes (R, S, X).
+
+    The core question: does the router learn to send R/X mode tokens
+    to Type A experts (encoder-decoder) and S-mode tokens to Type B
+    experts (decoder-only)?
+
+    Tests each mode separately on the same held-out windows and compares
+    per-layer expert selection patterns.
+    """
+    project_dir = Path(project_dir)
+    rng = random.Random(seed)
+
+    tok_path = project_dir / 'tokenizer' / 'tokenizer_with_authors.json'
+    if not tok_path.exists():
+        tok_path = project_dir / 'tokenizer' / 'tokenizer.json'
+    tokenizer = Tokenizer.from_file(str(tok_path))
+    init_special_tokens(tokenizer)
+
+    bos_id = tokenizer.token_to_id('<bos>')
+    eos_id = tokenizer.token_to_id('<eos>')
+    pad_id = tokenizer.token_to_id('<pad>')
+
+    held_out_path = project_dir / 'eval' / 'held_out_texts.json'
+    with open(held_out_path) as f:
+        held_out_names = json.load(f)
+
+    texts = []
+    for name in held_out_names:
+        path = project_dir / 'cleaned' / f'{name}.txt'
+        if path.exists():
+            text = path.read_text(encoding='utf-8')
+            enc = tokenizer.encode(text)
+            ids = [t for t in enc.ids if t not in (bos_id, eos_id)]
+            if len(ids) > config.context_len:
+                texts.append(ids)
+
+    if not texts:
+        print("  No held-out texts found")
+        return {}
+
+    def pad(ids, length):
+        if len(ids) >= length:
+            return ids[:length]
+        return ids + [pad_id] * (length - len(ids))
+
+    # Pre-generate windows for consistency across modes
+    windows = []
+    for _ in range(n_samples):
+        text_ids = rng.choice(texts)
+        start = rng.randint(0, len(text_ids) - config.context_len)
+        windows.append(text_ids[start:start + config.context_len])
+
+    mode_configs = {
+        'R': {'token_id': MODE_R_ID, 'encoder_available': 1.0},
+        'S': {'token_id': MODE_S_ID, 'encoder_available': 0.0},
+        'X': {'token_id': MODE_X_ID, 'encoder_available': 1.0},
+    }
+
+    mode_results = {}
+    model.eval()
+
+    for mode_name, mode_cfg in mode_configs.items():
+        tracker = RoutingTracker(model)
+        tracker.register_hooks()
+
+        with torch.no_grad():
+            for window in windows:
+                # Prepend mode token
+                seq = [mode_cfg['token_id']] + window[:config.context_len - 1]
+                input_ids = torch.tensor([pad(seq, config.context_len)],
+                                         dtype=torch.long, device=device)
+                enc_avail = torch.tensor([mode_cfg['encoder_available']],
+                                         device=device)
+
+                encoder_input_ids = input_ids if mode_cfg['encoder_available'] > 0.5 else None
+
+                model(
+                    decoder_input_ids=input_ids,
+                    encoder_input_ids=encoder_input_ids,
+                    encoder_available=enc_avail,
+                )
+
+        tracker.remove_hooks()
+
+        # Compile per-layer expert fractions for this mode
+        layer_fracs = {}
+        for layer_idx in sorted(tracker.stats.keys()):
+            counts = tracker.stats[layer_idx]['expert_counts']
+            total = sum(counts.values())
+            if total > 0:
+                expert_types = model.decoder_layers[layer_idx].expert_types
+                fracs = {}
+                for eidx in range(config.n_experts):
+                    etype = expert_types[eidx]
+                    fracs[f'expert_{eidx}_{etype}'] = counts.get(eidx, 0) / total
+                layer_fracs[f'layer_{layer_idx}'] = fracs
+
+        mode_results[mode_name] = layer_fracs
+
+    # Print comparison
+    expert_types = model.decoder_layers[0].expert_types
+    type_a_idx = [i for i, t in enumerate(expert_types) if t == 'A']
+    type_b_idx = [i for i, t in enumerate(expert_types) if t == 'B']
+
+    print(f"\nRouting by UL2 mode (Type A fraction per layer):")
+    print(f"  {'Layer':<10s}  {'R-mode':>8s}  {'S-mode':>8s}  {'X-mode':>8s}  {'Δ(R-S)':>8s}")
+    print(f"  {'─'*10}  {'─'*8}  {'─'*8}  {'─'*8}  {'─'*8}")
+
+    specialization_deltas = []
+    for layer_idx in range(config.n_dec_layers):
+        layer_key = f'layer_{layer_idx}'
+        type_a_fracs = {}
+        for mode in ['R', 'S', 'X']:
+            if layer_key in mode_results[mode]:
+                # Sum Type A expert fractions
+                a_frac = sum(
+                    mode_results[mode][layer_key].get(f'expert_{i}_A', 0)
+                    for i in type_a_idx
+                )
+                type_a_fracs[mode] = a_frac
+            else:
+                type_a_fracs[mode] = 0.5
+
+        delta = type_a_fracs['R'] - type_a_fracs['S']
+        specialization_deltas.append(delta)
+        print(f"  layer_{layer_idx:<4d}  {type_a_fracs['R']:>7.1%}  "
+              f"{type_a_fracs['S']:>7.1%}  {type_a_fracs['X']:>7.1%}  "
+              f"{delta:>+7.1%}")
+
+    mean_delta = sum(specialization_deltas) / len(specialization_deltas)
+    print(f"\n  Mean Δ(R-S): {mean_delta:+.1%}")
+    if abs(mean_delta) > 0.05:
+        print(f"  Router IS specializing by UL2 mode")
+    else:
+        print(f"  Router treats all modes similarly (not yet specialized)")
+
+    return {
+        'per_mode': mode_results,
+        'specialization_deltas': specialization_deltas,
+        'mean_delta': mean_delta,
+    }
+
+
 def run_phase1_eval(checkpoint_path, preset='tiny'):
     """Run all Phase 1 evaluations."""
     import sys
@@ -456,18 +618,24 @@ def run_phase1_eval(checkpoint_path, preset='tiny'):
     strat = loss_by_corruption_strategy(model, config, project_dir, device)
 
     print(f"\n{'='*60}")
-    print(f"  3. ROUTING BY TEXT")
+    print(f"  3. ROUTING BY UL2 MODE")
+    print(f"{'='*60}")
+    ul2_routing = routing_by_ul2_mode(model, config, project_dir, device)
+
+    print(f"\n{'='*60}")
+    print(f"  4. ROUTING BY TEXT")
     print(f"{'='*60}")
     routing = routing_by_text(model, config, project_dir, device)
 
     print(f"\n{'='*60}")
-    print(f"  4. LOSS vs RUBRIC SCORE")
+    print(f"  5. LOSS vs RUBRIC SCORE")
     print(f"{'='*60}")
     rubric = loss_by_rubric_score(model, config, project_dir, device)
 
     return {
         'reconstruction': recon,
         'corruption_strategies': strat,
+        'ul2_routing': ul2_routing,
         'routing_by_text': routing,
         'rubric_correlation': rubric,
     }
