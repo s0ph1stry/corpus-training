@@ -20,10 +20,8 @@ from tokenizers import Tokenizer
 
 from model.model import HeteroMoETransformer
 from model.config import ModelConfig
-from data.corruption import (
-    init_special_tokens, apply_corruption,
-    MODE_R_ID, MODE_S_ID, MODE_X_ID,
-)
+from data import corruption as corruption_mod
+from data.corruption import init_special_tokens, apply_corruption
 from eval.routing_analysis import RoutingTracker, compute_routing_entropy
 
 
@@ -84,7 +82,7 @@ def reconstruction_accuracy(model, config, project_dir, device,
             corrupted = result['corrupted_ids']
 
             # Prepend R-mode token (denoising eval = R-mode)
-            mode_token = MODE_R_ID
+            mode_token = corruption_mod.MODE_R_ID
             corrupted_with_mode = [mode_token] + corrupted[:config.context_len - 1]
             window_with_mode = [mode_token] + window[:config.context_len - 1]
 
@@ -188,8 +186,8 @@ def loss_by_corruption_strategy(model, config, project_dir, device,
             corrupted = result['corrupted_ids']
 
             # Prepend R-mode token for standard strategies
-            corrupted_with_mode = [MODE_R_ID] + corrupted[:config.context_len - 1]
-            window_with_mode = [MODE_R_ID] + window[:config.context_len - 1]
+            corrupted_with_mode = [corruption_mod.MODE_R_ID] + corrupted[:config.context_len - 1]
+            window_with_mode = [corruption_mod.MODE_R_ID] + window[:config.context_len - 1]
 
             def pad(ids, length):
                 if len(ids) >= length:
@@ -267,7 +265,7 @@ def routing_by_text(model, config, project_dir, device,
                 start = rng.randint(0, len(ids) - config.context_len)
                 window = ids[start:start + config.context_len]
                 # Prepend R-mode token (denoising context for routing_by_text)
-                seq = [MODE_R_ID] + window[:config.context_len - 1]
+                seq = [corruption_mod.MODE_R_ID] + window[:config.context_len - 1]
                 input_ids = torch.tensor([seq], dtype=torch.long, device=device)
                 enc_avail = torch.tensor([1.0], device=device)
                 model(
@@ -374,7 +372,7 @@ def loss_by_rubric_score(model, config, project_dir, device,
                 start = rng.randint(0, len(ids) - config.context_len)
                 window = ids[start:start + config.context_len]
                 # Prepend S-mode token (autoregressive eval)
-                seq = [MODE_S_ID] + window[:config.context_len - 1]
+                seq = [corruption_mod.MODE_S_ID] + window[:config.context_len - 1]
                 input_ids = torch.tensor([seq[:-1]], dtype=torch.long, device=device)
                 targets = torch.tensor([seq[1:]], dtype=torch.long, device=device)
 
@@ -488,9 +486,9 @@ def routing_by_ul2_mode(model, config, project_dir, device,
         windows.append(text_ids[start:start + config.context_len])
 
     mode_configs = {
-        'R': {'token_id': MODE_R_ID, 'encoder_available': 1.0},
-        'S': {'token_id': MODE_S_ID, 'encoder_available': 0.0},
-        'X': {'token_id': MODE_X_ID, 'encoder_available': 1.0},
+        'R': {'token_id': corruption_mod.MODE_R_ID, 'encoder_available': 1.0},
+        'S': {'token_id': corruption_mod.MODE_S_ID, 'encoder_available': 0.0},
+        'X': {'token_id': corruption_mod.MODE_X_ID, 'encoder_available': 1.0},
     }
 
     mode_results = {}
@@ -578,13 +576,13 @@ def routing_by_ul2_mode(model, config, project_dir, device,
     }
 
 
-def run_phase1_eval(checkpoint_path, preset='tiny'):
+def run_phase1_eval(checkpoint_path, preset='tiny', force_cpu=False):
     """Run all Phase 1 evaluations."""
     import sys
     sys.path.insert(0, str(Path(__file__).parent.parent))
     from training.trainer import get_device
 
-    device = get_device()
+    device = torch.device('cpu') if force_cpu else get_device()
     project_dir = str(Path(__file__).parent.parent)
     tok_dir = str(Path(project_dir) / 'tokenizer')
     config = ModelConfig.from_tokenizer(tok_dir, preset=preset)
@@ -646,5 +644,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--checkpoint', type=str, default='checkpoints/phase1/latest.pt')
     parser.add_argument('--preset', type=str, default='tiny')
+    parser.add_argument('--cpu', action='store_true', help='Force CPU (avoids MPS issues)')
     args = parser.parse_args()
-    run_phase1_eval(args.checkpoint, args.preset)
+    run_phase1_eval(args.checkpoint, args.preset, force_cpu=args.cpu)
