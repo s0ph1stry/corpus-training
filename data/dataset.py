@@ -44,7 +44,7 @@ class CorpusDataset(Dataset):
                  project_dir: str,
                  mode: str = 'phase1_denoise',
                  context_len: int = 512,
-                 samples_per_epoch: int = 10000,
+                 samples_per_epoch: int = 100000,
                  curriculum_warmup_frac: float = 0.15,
                  total_steps: int = 50000,
                  held_out_texts: Optional[set] = None):
