@@ -70,7 +70,8 @@ class Trainer:
                  use_wandb: bool = True,
                  wandb_project: str = 'corpus-training',
                  wandb_run_name: Optional[str] = None,
-                 phase: str = 'phase1'):
+                 phase: str = 'phase1',
+                 checkpoint_dir: Optional[str] = None):
 
         self.config = config
         self.project_dir = Path(project_dir)
@@ -140,8 +141,11 @@ class Trainer:
             self.scaler = torch.amp.GradScaler('cuda')
             print("  AMP enabled (float16 on CUDA)")
 
-        # Checkpoint dir
-        self.ckpt_dir = self.project_dir / 'checkpoints' / phase
+        # Checkpoint dir (can be overridden, e.g. to Google Drive)
+        if checkpoint_dir:
+            self.ckpt_dir = Path(checkpoint_dir)
+        else:
+            self.ckpt_dir = self.project_dir / 'checkpoints' / phase
         self.ckpt_dir.mkdir(parents=True, exist_ok=True)
 
         # Tracking

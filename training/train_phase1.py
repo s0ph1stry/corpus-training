@@ -40,6 +40,8 @@ def main():
     parser.add_argument('--resume', type=str, default=None,
                         help="Checkpoint path or 'latest'")
     parser.add_argument('--no-wandb', action='store_true')
+    parser.add_argument('--checkpoint-dir', type=str, default=None,
+                        help="Override checkpoint directory (e.g. Google Drive path)")
     args = parser.parse_args()
 
     # Config
@@ -86,6 +88,7 @@ def main():
         use_wandb=not args.no_wandb,
         wandb_run_name=f'phase1-{args.preset}',
         phase='phase1',
+        checkpoint_dir=args.checkpoint_dir,
     )
 
     # Resume if requested

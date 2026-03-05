@@ -40,6 +40,8 @@ def main():
     parser.add_argument('--phase1-ckpt', type=str, default=None,
                         help="Phase 1 checkpoint to start from (default: latest)")
     parser.add_argument('--no-wandb', action='store_true')
+    parser.add_argument('--checkpoint-dir', type=str, default=None,
+                        help="Override checkpoint directory (e.g. Google Drive path)")
     args = parser.parse_args()
 
     # Config
@@ -92,6 +94,7 @@ def main():
         use_wandb=not args.no_wandb,
         wandb_run_name=f'phase2-{args.preset}',
         phase='phase2',
+        checkpoint_dir=args.checkpoint_dir,
     )
 
     # Training loop
