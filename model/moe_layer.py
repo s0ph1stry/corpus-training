@@ -128,14 +128,15 @@ class MoELayer(nn.Module):
                 unique_batches = batch_indices.unique()
                 out = torch.zeros_like(tokens)
                 for b_idx in unique_batches:
+                    bi = b_idx.item()
                     mask = batch_indices == b_idx
                     b_tokens = tokens[mask]
-                    n_b = mask.sum()
+                    n_b = mask.sum().item()
                     # repeat() not expand() — MPS Metal stride checks
-                    b_enc = encoder_out[b_idx:b_idx+1].repeat(n_b, 1, 1)
+                    b_enc = encoder_out[bi:bi+1].repeat(n_b, 1, 1)
                     b_enc_mask = None
                     if encoder_mask is not None:
-                        b_enc_mask = encoder_mask[b_idx:b_idx+1].repeat(n_b, 1)
+                        b_enc_mask = encoder_mask[bi:bi+1].repeat(n_b, 1)
                     out[mask] = expert(b_tokens, b_enc, b_enc_mask).to(out.dtype)
             else:
                 out = expert(tokens)
