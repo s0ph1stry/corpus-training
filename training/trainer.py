@@ -9,6 +9,7 @@ Includes online difficulty adjustment feedback to the dataset.
 
 import contextlib
 import math
+import os
 import time
 from pathlib import Path
 from typing import Optional
@@ -31,7 +32,9 @@ except ImportError:
 
 
 def get_device() -> torch.device:
-    """Select best available device."""
+    """Select best available device. Set FORCE_CPU=1 to override."""
+    if os.environ.get('FORCE_CPU', ''):
+        return torch.device('cpu')
     if torch.cuda.is_available():
         return torch.device('cuda')
     elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
@@ -406,6 +409,50 @@ class Trainer:
             for _ in range(self.global_step):
                 self.scheduler.step()
             print(f"  Loaded model weights from step {self.global_step} (fresh optimizer/scheduler)")
+
+    def resurrect_dead_experts(self, threshold: float = 0.01, n_samples: int = 32):
+        """Detect and re-initialize dead routed experts.
+
+        Runs a small forward pass to check which experts have near-zero activation.
+        Dead experts get their router gate bias re-initialized to +0.5 (strongly
+        positive) to ensure they start receiving tokens again.
+
+        Call after load_checkpoint() and before training resumes.
+        """
+        import torch
+        self.model.eval()
+
+        # Generate random input for detection
+        seq_len = min(self.config.context_len, 128)
+        dummy_ids = torch.randint(1, self.config.vocab_size, (n_samples, seq_len),
+                                  device=self.device)
+        enc_avail = torch.ones(n_samples, device=self.device)  # encoder available
+
+        with torch.no_grad():
+            self.model(decoder_input_ids=dummy_ids, encoder_available=enc_avail)
+
+        # Check which experts are dead in each layer
+        resurrected = 0
+        fracs = self.model.moe_manager.layer_expert_fracs
+        for layer_i, layer_fracs in enumerate(fracs):
+            for expert_j, frac in enumerate(layer_fracs):
+                if frac < threshold:
+                    # Re-init this expert's gate bias to strongly positive
+                    router = self.model.decoder_layers[layer_i].router
+                    old_bias = router.gate.bias.data[expert_j].item()
+                    router.gate.bias.data[expert_j] = 0.5
+                    expert_type = self.model.decoder_layers[layer_i].expert_types[expert_j]
+                    print(f"  Resurrected layer {layer_i} expert {expert_j} "
+                          f"(Type {expert_type}): frac={frac:.4f}, "
+                          f"bias {old_bias:.3f} → 0.500")
+                    resurrected += 1
+
+        if resurrected == 0:
+            print("  No dead experts found.")
+        else:
+            print(f"  Resurrected {resurrected} dead expert(s).")
+
+        self.model.train()
 
     def get_routing_stats(self) -> dict:
         """Collect routing statistics from all MoE layers."""

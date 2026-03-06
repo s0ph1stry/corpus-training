@@ -42,6 +42,8 @@ def main():
                         help="Checkpoint path or 'latest'")
     parser.add_argument('--weights-only', action='store_true',
                         help="When resuming, only load model weights (reset optimizer/scheduler)")
+    parser.add_argument('--resurrect', action='store_true',
+                        help="Detect and re-initialize dead routed experts after loading checkpoint")
     parser.add_argument('--no-wandb', action='store_true')
     parser.add_argument('--checkpoint-dir', type=str, default=None,
                         help="Override checkpoint directory (e.g. Google Drive path)")
@@ -103,6 +105,9 @@ def main():
             ckpt_path = Path(args.resume)
         if ckpt_path.exists():
             trainer.load_checkpoint(str(ckpt_path), weights_only=args.weights_only)
+            if args.resurrect:
+                print("  Running dead expert resurrection...")
+                trainer.resurrect_dead_experts()
         else:
             print(f"  Warning: checkpoint not found: {ckpt_path}")
 
@@ -110,8 +115,8 @@ def main():
     print(f"\nStarting Phase 1 training ({args.total_steps} steps)")
     print(f"  Batch size: {args.batch_size}")
     print(f"  LR: {args.lr}")
-    print(f"  UL2 mode mixing: R=50% S=25% X=25%")
-    print(f"  (S-mode provides Type B gradient — no separate collapse mitigation needed)")
+    print(f"  Annealed mode forcing: R=80%→50%, S=10%→25%, X=10%→25%")
+    print(f"  Router jitter: {config.router_jitter_noise}, liveness floor: {config.liveness_min_frac}")
     print()
 
     dataset = loader.dataset

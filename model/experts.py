@@ -222,10 +222,12 @@ class Router(nn.Module):
         nn.init.constant_(self.gate.bias, 0.1)
 
     def forward(self, hidden_states: torch.Tensor,
-                encoder_available: torch.Tensor) -> tuple:
+                encoder_available: torch.Tensor,
+                jitter_noise: float = 0.0) -> tuple:
         """
         hidden_states: (n_tokens, d_model)
         encoder_available: (n_tokens, 1)
+        jitter_noise: std of Gaussian noise added to gate logits during training
 
         Returns:
             gate_weights: (n_tokens, n_experts) — ReLU + L1-normalized weights
@@ -238,6 +240,10 @@ class Router(nn.Module):
         # Gate
         gate_input = torch.cat([hidden_states.float(), enc_signal], dim=-1)
         gate_logits = self.gate(gate_input)  # (n_tokens, n_experts)
+
+        # Jitter: add noise during training to prevent dead ReLU fixed points
+        if self.training and jitter_noise > 0:
+            gate_logits = gate_logits + torch.randn_like(gate_logits) * jitter_noise
 
         # ReLU gating: variable sparsity
         scores = F.relu(gate_logits)
@@ -273,7 +279,8 @@ class MOEManager:
     """Tracks routing statistics across MoE layers.
 
     v2: Balance loss removed (ReLU routing provides natural specialization).
-    Only z-loss remains as optional regularizer (weight defaults to 0.0).
+    v2.1: Liveness loss added — penalizes expert activation fraction below a minimum
+    threshold to prevent dead ReLU fixed points in routing.
 
     Call reset() at the start of each forward pass.
     Call get_aux_loss() to retrieve accumulated loss for backprop.
@@ -282,6 +289,7 @@ class MOEManager:
     def __init__(self, **kwargs):
         # Accept any kwargs for backward compat (alpha_start, alpha_end, ramp_steps)
         self.z_losses = []
+        self.liveness_losses = []
 
         # Routing entropy tracking
         self.layer_entropies = []
@@ -291,6 +299,7 @@ class MOEManager:
 
     def reset(self):
         self.z_losses = []
+        self.liveness_losses = []
         self.layer_entropies = []
         self.layer_expert_fracs = []
 
@@ -298,15 +307,30 @@ class MOEManager:
         """No-op — returns 0.0. Kept to prevent trainer crash."""
         return 0.0
 
-    def add_routing_stats(self, gate_weights: torch.Tensor, n_experts: int):
+    def add_routing_stats(self, gate_weights: torch.Tensor, n_experts: int,
+                          min_frac: float = 0.0,
+                          gate_logits: torch.Tensor = None):
         """Track per-expert activation fraction and routing entropy.
 
         gate_weights: (n_tokens, n_experts) — ReLU-normalized weights
+        gate_logits: (n_tokens, n_experts) — pre-ReLU logits (for differentiable liveness)
+        min_frac: minimum activation fraction; shortfall is accumulated as liveness loss
         """
         # Per-expert activation fraction: fraction of tokens with nonzero weight
         active = (gate_weights > 0).float()
         fracs = active.mean(dim=0)  # (n_experts,)
         self.layer_expert_fracs.append(fracs.detach().cpu().tolist())
+
+        # Liveness loss: penalize experts with negative mean gate logits.
+        # This is differentiable even for completely dead experts (all post-ReLU = 0),
+        # because it operates on the pre-ReLU logits which always have gradient.
+        if min_frac > 0 and gate_logits is not None:
+            mean_logits = gate_logits.mean(dim=0)  # (n_experts,)
+            # Penalize negative mean logits (which cause expert death via ReLU)
+            # Heavier penalty the more negative: pushes toward 0 → expert starts firing
+            logit_penalty = torch.clamp(-mean_logits, min=0).sum()
+            if logit_penalty > 0:
+                self.liveness_losses.append(logit_penalty)
 
         # Routing entropy over the activation distribution
         # Treat fracs as a probability distribution (normalize)
@@ -324,13 +348,18 @@ class MOEManager:
         self.z_losses.append(z_loss)
 
     def get_aux_loss(self, global_step: int = 0,
-                     z_weight: float = 0.0) -> torch.Tensor:
-        """Return z-loss (or 0.0 if weight is 0 or no z-losses accumulated)."""
+                     z_weight: float = 0.0,
+                     liveness_weight: float = 0.0) -> torch.Tensor:
+        """Return z-loss + liveness loss."""
         total = torch.tensor(0.0)
         if z_weight > 0 and self.z_losses:
             device = self.z_losses[0].device
             total = total.to(device)
             total = total + z_weight * sum(self.z_losses) / len(self.z_losses)
+        if liveness_weight > 0 and self.liveness_losses:
+            device = self.liveness_losses[0].device
+            total = total.to(device)
+            total = total + liveness_weight * sum(self.liveness_losses) / len(self.liveness_losses)
         return total
 
     def get_routing_entropy(self) -> dict:

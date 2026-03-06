@@ -465,13 +465,28 @@ def sample_ul2_mode(step: int, total_steps: int,
                     phase: str = 'phase1') -> str:
     """Sample a UL2 denoiser mode (R, S, or X).
 
-    Phase 1: Heavy R/X denoising with S-mode for Type B gradient.
+    Phase 1 with annealing: Start R-heavy (easy: encoder available) and gradually
+    shift toward the target ratios. This gives the router a curriculum — learn
+    reconstruction first, then handle generation.
+
+    Early (step 0):    R=80%, S=10%, X=10%
+    Late  (step end):  R=50%, S=25%, X=25%  (= DEFAULT_MODE_RATIOS)
+
     Phase 2: Heavy S-mode generation with R/X maintenance denoising.
     """
     if phase == 'phase2':
         ratios = PHASE2_MODE_RATIOS
     else:
-        ratios = DEFAULT_MODE_RATIOS
+        # Anneal from R-heavy start to balanced target
+        progress = min(step / max(total_steps, 1), 1.0)
+        # Cubic easing — stay R-heavy longer, then shift
+        t = progress ** 2
+        start = {'R': 0.80, 'S': 0.10, 'X': 0.10}
+        end = DEFAULT_MODE_RATIOS
+        ratios = {
+            mode: start[mode] + t * (end[mode] - start[mode])
+            for mode in start
+        }
 
     modes = list(ratios.keys())
     weights = list(ratios.values())

@@ -2295,10 +2295,7 @@
       }
     }
   },
-  "decoder": {
-    "type": "BPEDecoder",
-    "suffix": "</w>"
-  },
+  "decoder": null,
   "model": {
     "type": "BPE",
     "dropout": null,

@@ -3,6 +3,14 @@ cleaned/
 raw/
 tokenized/
 checkpoints/
+data/token_cache/
+data/sources.csv
+
+# Eval results (local)
+eval/results/
+
+# Training logs
+logs/
 
 # Python
 __pycache__/

@@ -96,11 +96,17 @@ class MoELayer(nn.Module):
         shared_delta = self.shared_expert(x_flat)
 
         # ─── 4. ReLU-routed experts ───
-        gate_weights, gate_logits = self.router(x_flat, enc_avail_per_token)
+        jitter = self.config.router_jitter_noise if self.training else 0.0
+        gate_weights, gate_logits = self.router(x_flat, enc_avail_per_token,
+                                                jitter_noise=jitter)
         # gate_weights: (B*S, n_experts) — ReLU + L1-normalized
 
-        # Track routing stats and optional z-loss
-        self.moe_manager.add_routing_stats(gate_weights, self.config.n_experts)
+        # Track routing stats, liveness loss, and optional z-loss
+        self.moe_manager.add_routing_stats(
+            gate_weights, self.config.n_experts,
+            min_frac=self.config.liveness_min_frac,
+            gate_logits=gate_logits,
+        )
         if self.config.router_z_loss_weight > 0:
             self.moe_manager.add_z_loss(gate_logits)
 

@@ -180,10 +180,11 @@ class HeteroMoETransformer(nn.Module):
         inner = F.linear(dec_hidden, self.embedding.projection.weight.t())
         logits = self.lm_head_vocab(inner)
 
-        # Aux loss from all MoE layers (alpha ramped by global_step)
+        # Aux loss from all MoE layers
         aux_loss = self.moe_manager.get_aux_loss(
             global_step=self.global_step,
             z_weight=self.config.router_z_loss_weight,
+            liveness_weight=self.config.liveness_loss_weight,
         )
 
         return {

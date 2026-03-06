@@ -109,10 +109,11 @@ def evaluate_perplexity(model: HeteroMoETransformer,
         with open(csv_path) as f:
             reader = csv.DictReader(f)
             for row in reader:
-                difficulty[row['name']] = {
-                    'difficulty': float(row['difficulty']),
-                    'tier': int(row.get('tier', 1)),
-                }
+                if row.get('difficulty', '').strip():
+                    difficulty[row['name']] = {
+                        'difficulty': float(row['difficulty']),
+                        'tier': int(row.get('tier', 1) or 1),
+                    }
 
     results = {}
     total_ppl = 0.0

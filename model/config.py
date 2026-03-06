@@ -43,6 +43,11 @@ class ModelConfig:
     aux_loss_weight: float = 0.0  # balance loss disabled in v2
     router_z_loss_weight: float = 0.0  # z-loss disabled by default in v2
 
+    # Expert liveness (v2.1): prevent dead ReLU fixed point in routing
+    router_jitter_noise: float = 0.1   # std of Gaussian noise on gate logits during training
+    liveness_min_frac: float = 0.05    # minimum expert activation fraction (5%)
+    liveness_loss_weight: float = 0.1  # weight for liveness penalty
+
     # SSM (Mamba-2 SSD blocks)
     ssm_d_state: int = 16
     ssm_dt_rank: int = 16
@@ -199,6 +204,9 @@ def TinyConfig(**overrides) -> ModelConfig:
         ssm_dt_rank=16,
         aux_loss_weight=0.0,          # balance loss disabled
         router_z_loss_weight=0.0,     # z-loss disabled by default
+        router_jitter_noise=0.1,      # prevent dead ReLU in routing
+        liveness_min_frac=0.05,       # 5% minimum expert activation
+        liveness_loss_weight=0.1,     # liveness penalty weight
     )
     defaults.update(overrides)
     return ModelConfig(**defaults)
