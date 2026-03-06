@@ -384,16 +384,28 @@ class Trainer:
         latest_path = self.ckpt_dir / 'latest.pt'
         torch.save(ckpt, latest_path)
 
-    def load_checkpoint(self, path: str):
-        """Load a checkpoint."""
+    def load_checkpoint(self, path: str, weights_only: bool = False):
+        """Load a checkpoint.
+
+        Args:
+            weights_only: If True, only load model weights (not optimizer/scheduler).
+                         Use when changing hyperparameters like LR between runs.
+        """
         ckpt = torch.load(path, map_location=self.device, weights_only=False)
         self.model.load_state_dict(ckpt['model_state_dict'])
-        self.optimizer.load_state_dict(ckpt['optimizer_state_dict'])
-        self.scheduler.load_state_dict(ckpt['scheduler_state_dict'])
         self.global_step = ckpt['global_step']
-        if self.scaler is not None and 'scaler_state_dict' in ckpt:
-            self.scaler.load_state_dict(ckpt['scaler_state_dict'])
-        print(f"  Loaded checkpoint from step {self.global_step}")
+
+        if not weights_only:
+            self.optimizer.load_state_dict(ckpt['optimizer_state_dict'])
+            self.scheduler.load_state_dict(ckpt['scheduler_state_dict'])
+            if self.scaler is not None and 'scaler_state_dict' in ckpt:
+                self.scaler.load_state_dict(ckpt['scaler_state_dict'])
+            print(f"  Loaded checkpoint from step {self.global_step}")
+        else:
+            # Fast-forward scheduler to the resumed step
+            for _ in range(self.global_step):
+                self.scheduler.step()
+            print(f"  Loaded model weights from step {self.global_step} (fresh optimizer/scheduler)")
 
     def get_routing_stats(self) -> dict:
         """Collect routing statistics from all MoE layers."""

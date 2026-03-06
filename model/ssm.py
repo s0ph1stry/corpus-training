@@ -147,7 +147,8 @@ class Mamba2Block(nn.Module):
 
         # Log-decay per position: dt * A
         dA = dt * A[None, None, None, :]  # (B, nC, K, H) — negative values
-        dA_cumsum = torch.cumsum(dA, dim=2)  # (B, nC, K, H)
+        # Clamp cumulative decay to prevent exp overflow/underflow in gradients
+        dA_cumsum = torch.cumsum(dA, dim=2).clamp(min=-20.0, max=0.0)  # (B, nC, K, H)
 
         # ─── Intra-chunk (quadratic form) ───
         # Decay from j to i within a chunk: exp(dA_cumsum[i] - dA_cumsum[j])

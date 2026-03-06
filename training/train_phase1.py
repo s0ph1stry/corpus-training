@@ -40,6 +40,8 @@ def main():
     parser.add_argument('--lr', type=float, default=None)
     parser.add_argument('--resume', type=str, default=None,
                         help="Checkpoint path or 'latest'")
+    parser.add_argument('--weights-only', action='store_true',
+                        help="When resuming, only load model weights (reset optimizer/scheduler)")
     parser.add_argument('--no-wandb', action='store_true')
     parser.add_argument('--checkpoint-dir', type=str, default=None,
                         help="Override checkpoint directory (e.g. Google Drive path)")
@@ -100,7 +102,7 @@ def main():
         else:
             ckpt_path = Path(args.resume)
         if ckpt_path.exists():
-            trainer.load_checkpoint(str(ckpt_path))
+            trainer.load_checkpoint(str(ckpt_path), weights_only=args.weights_only)
         else:
             print(f"  Warning: checkpoint not found: {ckpt_path}")
 
