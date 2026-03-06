@@ -1,35 +1,34 @@
 """
-MoE layer: wires Router + heterogeneous experts.
+MoE layer v2: Hymba SSM+Attention fusion → shared expert → ReLU-routed experts.
 
-Dispatch-and-combine with per-expert branching:
-  - Type A experts receive (tokens, encoder_out, batch_indices, mask)
-  - Type B experts receive (tokens,) only
+Each decoder layer:
+  1. Hymba block: shared pre-norm → parallel SSM + CausalAttn → per-channel fusion → residual
+  2. Shared expert: always-on wide FFN (4x d_model) on all tokens
+  3. ReLU-routed experts: Type A (cross-attn + FFN) and Type B (FFN only), 2x d_model
 
-Capacity: floor(top_k × capacity_factor × tokens / n_experts).
-Train capacity_factor=1.25, eval=2.0. Overflow tokens pass through
-residual only (no expert processing).
+No capacity enforcement — ReLU provides natural sparsity (tokens can activate 0, 1, or all experts).
 """
 
-import math
 import torch
 import torch.nn as nn
 
 from model.config import ModelConfig
+from model.ssm import Mamba2Block
 from model.experts import (
     CausalSelfAttention,
     EncoderDecoderExpert,
     DecoderOnlyExpert,
+    SharedExpert,
     Router,
     MOEManager,
 )
 
 
 class MoELayer(nn.Module):
-    """Single MoE decoder layer: shared self-attn → router → expert dispatch → combine.
+    """Single MoE decoder layer: Hymba fusion → shared expert → routed experts.
 
-    The self-attention is shared across all experts (not per-expert).
-    Only the expert-specific processing (cross-attn for Type A, FFN for both)
-    is routed.
+    The Hymba block fuses SSM (sequential/local) and attention (global) pathways
+    with learned per-channel mixing weights. This replaces the v1 shared self-attention.
     """
 
     def __init__(self, config: ModelConfig, moe_manager: MOEManager):
@@ -37,20 +36,26 @@ class MoELayer(nn.Module):
         self.config = config
         self.moe_manager = moe_manager
 
-        # Shared causal self-attention (pre-expert)
-        self.self_attn_norm = nn.LayerNorm(config.d_model)
+        # Hymba fusion: shared norm → parallel SSM + Attn → per-channel mix
+        self.hymba_norm = nn.LayerNorm(config.d_model)
+        self.ssm = Mamba2Block(config)
         self.self_attn = CausalSelfAttention(config)
+        self.beta_ssm = nn.Parameter(0.7 * torch.ones(config.d_model))
+        self.beta_attn = nn.Parameter(0.3 * torch.ones(config.d_model))
 
-        # Router
+        # Shared expert (always-on, 4x d_model FFN)
+        self.shared_expert = SharedExpert(config)
+
+        # Router (ReLU gating, gates only routed experts)
         self.router = Router(config)
 
-        # Heterogeneous experts
+        # Routed experts (2x d_model FFN each)
         experts = []
-        self.expert_types = []  # 'A' or 'B' for each expert
-        for i in range(config.n_type_a):
+        self.expert_types = []
+        for _ in range(config.n_type_a):
             experts.append(EncoderDecoderExpert(config))
             self.expert_types.append('A')
-        for i in range(config.n_type_b_computed):
+        for _ in range(config.n_type_b_computed):
             experts.append(DecoderOnlyExpert(config))
             self.expert_types.append('B')
         self.experts = nn.ModuleList(experts)
@@ -71,11 +76,15 @@ class MoELayer(nn.Module):
         """
         B, S, D = x.shape
 
-        # 1. Shared causal self-attention
-        x = x + self.self_attn(self.self_attn_norm(x), padding_mask)
+        # ─── 1. Hymba fusion: parallel SSM + Attention with per-channel mixing ───
+        h = self.hymba_norm(x)
+        ssm_out = self.ssm(h)
+        attn_out = self.self_attn(h, padding_mask)
+        fused = self.beta_ssm * ssm_out + self.beta_attn * attn_out
+        x = x + fused  # pre-norm residual
 
-        # 2. Flatten for routing
-        x_flat = x.view(B * S, D)  # (B*S, D)
+        # ─── 2. Flatten for expert processing ───
+        x_flat = x.view(B * S, D)
 
         # Build per-token encoder_available signal
         if encoder_available is not None:
@@ -83,74 +92,46 @@ class MoELayer(nn.Module):
         else:
             enc_avail_per_token = torch.zeros(B * S, 1, device=x.device)
 
-        # 3. Route
-        expert_indices, expert_weights, router_logits = self.router(
-            x_flat, enc_avail_per_token
-        )
-        # expert_indices: (B*S, top_k), expert_weights: (B*S, top_k)
+        # ─── 3. Shared expert (always-on) ───
+        shared_delta = self.shared_expert(x_flat)
 
-        # Accumulate aux losses
-        self.moe_manager.add_balance_loss(
-            router_logits, expert_indices, self.config.n_experts
-        )
-        self.moe_manager.add_z_loss(router_logits)
+        # ─── 4. ReLU-routed experts ───
+        gate_weights, gate_logits = self.router(x_flat, enc_avail_per_token)
+        # gate_weights: (B*S, n_experts) — ReLU + L1-normalized
 
-        # 4. Capacity check
-        n_tokens = B * S
-        if self.training:
-            capacity_factor = self.config.capacity_factor_train
-        else:
-            capacity_factor = self.config.capacity_factor_eval
-        capacity = math.floor(
-            self.config.top_k * capacity_factor * n_tokens / self.config.n_experts
-        )
+        # Track routing stats and optional z-loss
+        self.moe_manager.add_routing_stats(gate_weights, self.config.n_experts)
+        if self.config.router_z_loss_weight > 0:
+            self.moe_manager.add_z_loss(gate_logits)
 
-        # 5. Dispatch to experts (grouped by expert for efficiency)
-        # Output starts as zeros (overflow tokens get residual only)
-        expert_output = torch.zeros_like(x_flat)
+        # Dispatch to each routed expert
+        routed_delta = torch.zeros_like(x_flat)
 
-        # Group all (position, top_k_slot) pairs by expert index
-        expert_to_tokens = {}
-        for k in range(self.config.top_k):
-            for expert_idx in range(self.config.n_experts):
-                token_mask = expert_indices[:, k] == expert_idx
-                token_positions = token_mask.nonzero(as_tuple=True)[0]
-                if len(token_positions) > 0:
-                    entry = expert_to_tokens.setdefault(expert_idx, {'positions': [], 'slots': []})
-                    entry['positions'].append(token_positions)
-                    entry['slots'].append(torch.full_like(token_positions, k))
+        for expert_idx in range(self.config.n_experts):
+            # Select tokens with nonzero gate weight for this expert
+            weights_i = gate_weights[:, expert_idx]  # (B*S,)
+            active_mask = weights_i > 0
+            active_positions = active_mask.nonzero(as_tuple=True)[0]
 
-        # Process each expert once with all its tokens
-        for expert_idx, token_info in expert_to_tokens.items():
-            all_positions = torch.cat(token_info['positions'])
-            all_slots = torch.cat(token_info['slots'])
+            if len(active_positions) == 0:
+                continue
 
-            # Enforce capacity across all top-k slots combined
-            if len(all_positions) > capacity:
-                all_positions = all_positions[:capacity]
-                all_slots = all_slots[:capacity]
-
-            tokens = x_flat[all_positions]  # (n_selected, D)
-            weights = expert_weights[all_positions, all_slots].unsqueeze(-1)
+            tokens = x_flat[active_positions]  # (n_active, D)
+            w = weights_i[active_positions].unsqueeze(-1)  # (n_active, 1)
 
             expert = self.experts[expert_idx]
             expert_type = self.expert_types[expert_idx]
 
             if expert_type == 'A' and encoder_out is not None:
-                # Process cross-attention per batch element to avoid
-                # duplicating encoder_out for every token (VRAM optimization).
-                # Instead of gathering (N, enc_S, D) which copies encoder for
-                # every token, we loop over batch elements and share encoder KV.
-                batch_indices = all_positions // S
+                # Per-batch-element loop for cross-attention (MPS/VRAM optimization)
+                batch_indices = active_positions // S
                 unique_batches = batch_indices.unique()
                 out = torch.zeros_like(tokens)
                 for b_idx in unique_batches:
                     mask = batch_indices == b_idx
-                    b_tokens = tokens[mask]  # (n_b, D)
-                    # Single encoder output repeated for tokens from this batch element.
-                    # repeat() copies memory (expand() breaks MPS Metal stride checks)
-                    # but the per-batch-element loop keeps each copy small.
+                    b_tokens = tokens[mask]
                     n_b = mask.sum()
+                    # repeat() not expand() — MPS Metal stride checks
                     b_enc = encoder_out[b_idx:b_idx+1].repeat(n_b, 1, 1)
                     b_enc_mask = None
                     if encoder_mask is not None:
@@ -159,9 +140,10 @@ class MoELayer(nn.Module):
             else:
                 out = expert(tokens)
 
-            # Match dtype for AMP compatibility (experts may return float32 under autocast)
-            expert_output.index_add_(0, all_positions, (weights * out).to(expert_output.dtype))
+            routed_delta.index_add_(
+                0, active_positions, (w * out).to(routed_delta.dtype)
+            )
 
-        # 6. Reshape and add residual
-        expert_output = expert_output.view(B, S, D)
-        return x + expert_output
+        # ─── 5. Combine and reshape ───
+        combined = (shared_delta + routed_delta).view(B, S, D)
+        return x + combined

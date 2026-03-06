@@ -40,25 +40,28 @@ class RoutingTracker:
 
     def _make_hook(self, layer_idx: int):
         def hook(module, input, output):
-            expert_indices, expert_weights, router_logits = output
+            # v2 Router returns (gate_weights, gate_logits)
+            gate_weights, gate_logits = output
             hidden_states, enc_avail = input
 
             enc_mask = enc_avail.squeeze(-1) > 0.5
+            n_tokens = gate_weights.shape[0]
 
-            for k in range(expert_indices.shape[1]):
-                for idx in expert_indices[:, k].tolist():
-                    self.stats[layer_idx]['expert_counts'][idx] += 1
+            # With ReLU routing, a token can activate 0, 1, or multiple experts.
+            # Count tokens with nonzero weight per expert.
+            for expert_idx in range(gate_weights.shape[1]):
+                active = gate_weights[:, expert_idx] > 0
+                count = active.sum().item()
+                self.stats[layer_idx]['expert_counts'][expert_idx] += count
 
-                # Separate by encoder availability
-                enc_indices = expert_indices[enc_mask, k]
-                no_enc_indices = expert_indices[~enc_mask, k]
+                # Split by encoder availability
+                enc_count = (active & enc_mask).sum().item()
+                no_enc_count = (active & ~enc_mask).sum().item()
+                self.stats[layer_idx]['expert_counts_enc_avail'][expert_idx] += enc_count
+                self.stats[layer_idx]['expert_counts_no_enc'][expert_idx] += no_enc_count
 
-                for idx in enc_indices.tolist():
-                    self.stats[layer_idx]['expert_counts_enc_avail'][idx] += 1
-                for idx in no_enc_indices.tolist():
-                    self.stats[layer_idx]['expert_counts_no_enc'][idx] += 1
-
-            self.stats[layer_idx]['total_tokens'] += expert_indices.shape[0]
+            # total_tokens counts unique tokens (not token-expert assignments)
+            self.stats[layer_idx]['total_tokens'] += n_tokens
             self.stats[layer_idx]['total_enc_avail'] += enc_mask.sum().item()
             self.stats[layer_idx]['total_no_enc'] += (~enc_mask).sum().item()
 

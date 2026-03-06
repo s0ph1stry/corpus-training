@@ -1,13 +1,14 @@
 """
 Expert types and router for the heterogeneous MoE.
 
-Type A (EncoderDecoderExpert): causal self-attn → cross-attn (K/V from encoder) → FFN
-Type B (DecoderOnlyExpert): causal self-attn → FFN
+Type A (EncoderDecoderExpert): cross-attn (K/V from encoder) → FFN (2x d_model)
+Type B (DecoderOnlyExpert): FFN only (2x d_model)
+SharedExpert: always-on FFN (4x d_model)
 
-Router: Linear(d_model + 1, n_experts), where +1 is the encoder_available signal.
-The router learns when to reflect (Type A) and when to generate (Type B).
+v2 Router: ReLU gating with learned encoder_available signal.
+Variable sparsity — tokens can activate 0, 1, or all experts.
 
-MOEManager: accumulates auxiliary losses (balance + z-loss) across layers.
+MOEManager: tracks routing statistics, optional z-loss.
 """
 
 import math
@@ -129,13 +130,14 @@ class CrossAttention(nn.Module):
 class ExpertFFN(nn.Module):
     """Feed-forward network for an individual expert."""
 
-    def __init__(self, config: ModelConfig):
+    def __init__(self, config: ModelConfig, d_ff: int = None):
         super().__init__()
+        ffn_dim = d_ff if d_ff is not None else config.d_ff
         self.net = nn.Sequential(
-            nn.Linear(config.d_model, config.d_ff),
+            nn.Linear(config.d_model, ffn_dim),
             nn.GELU(),
             nn.Dropout(config.dropout),
-            nn.Linear(config.d_ff, config.d_model),
+            nn.Linear(ffn_dim, config.d_model),
             nn.Dropout(config.dropout),
         )
 
@@ -155,7 +157,7 @@ class EncoderDecoderExpert(nn.Module):
         self.cross_attn_norm = nn.LayerNorm(config.d_model)
         self.cross_attn = CrossAttention(config)
         self.ffn_norm = nn.LayerNorm(config.d_model)
-        self.ffn = ExpertFFN(config)
+        self.ffn = ExpertFFN(config, d_ff=config.d_model * 2)
 
     def forward(self, x: torch.Tensor,
                 encoder_out: torch.Tensor = None,
@@ -184,7 +186,7 @@ class DecoderOnlyExpert(nn.Module):
     def __init__(self, config: ModelConfig):
         super().__init__()
         self.ffn_norm = nn.LayerNorm(config.d_model)
-        self.ffn = ExpertFFN(config)
+        self.ffn = ExpertFFN(config, d_ff=config.d_model * 2)
 
     def forward(self, x: torch.Tensor, **kwargs) -> torch.Tensor:
         """x: (n_tokens, d_model) — dispatched tokens. Extra kwargs ignored.
@@ -195,14 +197,13 @@ class DecoderOnlyExpert(nn.Module):
 
 
 class Router(nn.Module):
-    """MoE router with learned encoder_available signal projection.
+    """MoE router with ReLU gating and learned encoder_available signal.
 
-    Input: hidden_state (d_model) concatenated with encoder signal projection (d_model//4).
-    Output: top-k expert selection with softmax weights.
+    v2: ReLU replaces softmax+top-k. Variable sparsity — a token can activate
+    0, 1, or all experts. Gate outputs are ReLU'd then L1-normalized.
 
     The encoder_available signal is projected from a 1-bit scalar through a learned
-    Linear(1, d_model//4) + LayerNorm, giving the router a richer signal than raw
-    binary concatenation. (Grok audit patch, 2026-03-04)
+    Linear(1, d_model//4) + LayerNorm. (Grok audit patch, 2026-03-04)
 
     Runs in float32 for numerical stability regardless of model dtype.
     """
@@ -210,112 +211,111 @@ class Router(nn.Module):
     def __init__(self, config: ModelConfig):
         super().__init__()
         self.n_experts = config.n_experts
-        self.top_k = config.top_k
 
         # Learned encoder_available projection (Grok patch: upgrade from 1-bit)
         self.enc_signal_dim = max(config.d_model // 4, 1)
         self.enc_signal_proj = nn.Linear(1, self.enc_signal_dim)
         self.enc_signal_norm = nn.LayerNorm(self.enc_signal_dim)
 
-        self.gate = nn.Linear(config.d_model + self.enc_signal_dim, config.n_experts, bias=False)
+        # Gate with bias (init +0.1 to prevent dead ReLU at init)
+        self.gate = nn.Linear(config.d_model + self.enc_signal_dim, config.n_experts, bias=True)
+        nn.init.constant_(self.gate.bias, 0.1)
 
     def forward(self, hidden_states: torch.Tensor,
                 encoder_available: torch.Tensor) -> tuple:
         """
-        hidden_states: (batch * seq_len, d_model) — flattened token representations
-        encoder_available: (batch * seq_len, 1) — binary signal per token
+        hidden_states: (n_tokens, d_model)
+        encoder_available: (n_tokens, 1)
 
         Returns:
-            expert_indices: (n_tokens, top_k) — selected expert indices
-            expert_weights: (n_tokens, top_k) — softmax weights for selected experts
-            router_logits: (n_tokens, n_experts) — raw logits for aux loss
+            gate_weights: (n_tokens, n_experts) — ReLU + L1-normalized weights
+            gate_logits: (n_tokens, n_experts) — raw logits for z-loss / logging
         """
         # Project encoder_available through learned embedding
         enc_signal = self.enc_signal_proj(encoder_available.float())
         enc_signal = self.enc_signal_norm(enc_signal)
 
-        # Concatenate with hidden state
+        # Gate
         gate_input = torch.cat([hidden_states.float(), enc_signal], dim=-1)
-        router_logits = self.gate(gate_input)  # (n_tokens, n_experts)
+        gate_logits = self.gate(gate_input)  # (n_tokens, n_experts)
 
-        # Top-k selection
-        topk_weights, topk_indices = torch.topk(router_logits, self.top_k, dim=-1)
-        topk_weights = F.softmax(topk_weights.float(), dim=-1)
+        # ReLU gating: variable sparsity
+        scores = F.relu(gate_logits)
 
-        return topk_indices, topk_weights, router_logits
+        # L1 normalize (tokens with all-zero scores get zero weights — residual only)
+        gate_weights = scores / (scores.sum(dim=-1, keepdim=True) + 1e-6)
+
+        return gate_weights, gate_logits
+
+
+class SharedExpert(nn.Module):
+    """Always-on shared expert with wide FFN (4x d_model).
+
+    Runs on all tokens regardless of routing. Provides a stable gradient
+    path while routed experts specialize.
+    """
+
+    def __init__(self, config: ModelConfig):
+        super().__init__()
+        d_ff = config.d_ff_shared  # 4x d_model
+        self.ffn_norm = nn.LayerNorm(config.d_model)
+        self.up = nn.Linear(config.d_model, d_ff)
+        self.down = nn.Linear(d_ff, config.d_model)
+        self.dropout = nn.Dropout(config.dropout)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """x: (n_tokens, d_model). Returns delta only."""
+        h = self.ffn_norm(x)
+        return self.dropout(self.down(F.gelu(self.up(h))))
 
 
 class MOEManager:
-    """Accumulates auxiliary losses and routing statistics across MoE layers.
+    """Tracks routing statistics across MoE layers.
+
+    v2: Balance loss removed (ReLU routing provides natural specialization).
+    Only z-loss remains as optional regularizer (weight defaults to 0.0).
 
     Call reset() at the start of each forward pass.
-    Call get_aux_loss() to retrieve the accumulated loss for backprop.
-
-    Grok audit patches (2026-03-04):
-    - Alpha ramping: balance_weight ramps from alpha_start to alpha_end over ramp_steps
-    - Routing entropy monitoring: tracks per-layer entropy, alerts on collapse
+    Call get_aux_loss() to retrieve accumulated loss for backprop.
     """
 
-    def __init__(self, alpha_start: float = 0.01, alpha_end: float = 0.07,
-                 ramp_steps: int = 10000):
-        self.balance_losses = []
+    def __init__(self, **kwargs):
+        # Accept any kwargs for backward compat (alpha_start, alpha_end, ramp_steps)
         self.z_losses = []
 
-        # Alpha ramp parameters (Grok patch)
-        self.alpha_start = alpha_start
-        self.alpha_end = alpha_end
-        self.ramp_steps = ramp_steps
-
-        # Routing entropy tracking (Grok patch)
-        self.layer_entropies = []  # per-layer routing entropy for current forward pass
-        self.entropy_history = []  # list of per-checkpoint mean entropies
+        # Routing entropy tracking
+        self.layer_entropies = []
+        self.layer_expert_fracs = []
+        self.entropy_history = []
         self.collapse_alert = False
 
     def reset(self):
-        self.balance_losses = []
         self.z_losses = []
         self.layer_entropies = []
-        self.layer_expert_fracs = []  # per-layer expert activation fractions
+        self.layer_expert_fracs = []
 
-    def get_ramped_alpha(self, global_step: int) -> float:
-        """Linear ramp from alpha_start to alpha_end over ramp_steps."""
-        if global_step >= self.ramp_steps:
-            return self.alpha_end
-        t = global_step / self.ramp_steps
-        return self.alpha_start + t * (self.alpha_end - self.alpha_start)
+    def get_ramped_alpha(self, global_step: int = 0) -> float:
+        """No-op — returns 0.0. Kept to prevent trainer crash."""
+        return 0.0
 
-    def add_balance_loss(self, router_logits: torch.Tensor,
-                         expert_indices: torch.Tensor,
-                         n_experts: int):
-        """Switch Transformer load-balancing loss.
+    def add_routing_stats(self, gate_weights: torch.Tensor, n_experts: int):
+        """Track per-expert activation fraction and routing entropy.
 
-        Encourages each expert to receive roughly equal traffic.
-        L_balance = n_experts * sum_i(f_i * P_i)
-        where f_i = fraction of tokens routed to expert i
-              P_i = average routing probability for expert i
+        gate_weights: (n_tokens, n_experts) — ReLU-normalized weights
         """
-        probs = F.softmax(router_logits.float(), dim=-1)
+        # Per-expert activation fraction: fraction of tokens with nonzero weight
+        active = (gate_weights > 0).float()
+        fracs = active.mean(dim=0)  # (n_experts,)
+        self.layer_expert_fracs.append(fracs.detach().cpu().tolist())
 
-        # f_i: fraction of tokens dispatched to each expert (all top-k slots)
-        dispatched = expert_indices.reshape(-1)
-        one_hot = F.one_hot(dispatched, n_experts).float()
-        f = one_hot.mean(dim=0)
-
-        # P_i: average probability assigned to each expert
-        P = probs.mean(dim=0)
-
-        balance_loss = n_experts * (f * P).sum()
-        self.balance_losses.append(balance_loss)
-
-        # Track routing entropy (Grok patch)
-        entropy = -(probs * (probs + 1e-10).log()).sum(dim=-1).mean()
-        self.layer_entropies.append(entropy.item())
-
-        # Track per-expert activation fractions
-        self.layer_expert_fracs.append(f.detach().cpu().tolist())
+        # Routing entropy over the activation distribution
+        # Treat fracs as a probability distribution (normalize)
+        p = fracs / (fracs.sum() + 1e-10)
+        entropy = -(p * (p + 1e-10).log()).sum().item()
+        self.layer_entropies.append(entropy)
 
     def add_z_loss(self, router_logits: torch.Tensor):
-        """Router z-loss: penalizes large logits to prevent router collapse.
+        """Router z-loss: penalizes large logits to prevent router instability.
 
         L_z = (1/n) * sum(log(sum(exp(logits)))^2)
         """
@@ -324,18 +324,10 @@ class MOEManager:
         self.z_losses.append(z_loss)
 
     def get_aux_loss(self, global_step: int = 0,
-                     z_weight: float = 0.001) -> torch.Tensor:
-        """Return weighted sum of all accumulated auxiliary losses.
-
-        balance_weight is computed from alpha ramp schedule based on global_step.
-        """
-        balance_weight = self.get_ramped_alpha(global_step)
+                     z_weight: float = 0.0) -> torch.Tensor:
+        """Return z-loss (or 0.0 if weight is 0 or no z-losses accumulated)."""
         total = torch.tensor(0.0)
-        if self.balance_losses:
-            device = self.balance_losses[0].device
-            total = total.to(device)
-            total = total + balance_weight * sum(self.balance_losses) / len(self.balance_losses)
-        if self.z_losses:
+        if z_weight > 0 and self.z_losses:
             device = self.z_losses[0].device
             total = total.to(device)
             total = total + z_weight * sum(self.z_losses) / len(self.z_losses)
@@ -347,9 +339,10 @@ class MOEManager:
                 for i, e in enumerate(self.layer_entropies)}
 
     def get_expert_fracs(self) -> dict:
-        """Return per-layer, per-expert activation fractions from the last forward pass.
+        """Return per-layer, per-expert activation fractions.
 
-        Keys like 'expert_frac/layer_0/expert_0', values are fraction of tokens routed there.
+        Keys like 'expert_frac/layer_0/expert_0', values are fraction of tokens
+        with nonzero gate weight for that expert.
         """
         result = {}
         for layer_i, fracs in enumerate(self.layer_expert_fracs):
@@ -358,11 +351,7 @@ class MOEManager:
         return result
 
     def check_collapse(self, threshold: float = 0.4, window: int = 3) -> bool:
-        """Check if routing entropy has been below threshold for window checkpoints.
-
-        Call this at checkpoint time with the mean entropy of the evaluation batch.
-        Returns True if collapse is detected.
-        """
+        """Check if routing entropy has been below threshold for window checkpoints."""
         if self.layer_entropies:
             mean_entropy = sum(self.layer_entropies) / len(self.layer_entropies)
             self.entropy_history.append(mean_entropy)

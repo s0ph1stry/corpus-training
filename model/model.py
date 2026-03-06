@@ -52,11 +52,7 @@ class HeteroMoETransformer(nn.Module):
     def __init__(self, config: ModelConfig):
         super().__init__()
         self.config = config
-        self.moe_manager = MOEManager(
-            alpha_start=config.aux_loss_weight,
-            alpha_end=0.07,
-            ramp_steps=10000,
-        )
+        self.moe_manager = MOEManager()
         self.global_step = 0  # updated by trainer
 
         # Shared factored embedding

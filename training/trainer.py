@@ -136,10 +136,20 @@ class Trainer:
             )
 
         # Automatic mixed precision (significant speedup on CUDA)
+        # Use bfloat16 on Ampere+ GPUs (A100, etc.) — no GradScaler needed,
+        # much more numerically stable than float16. Fall back to float16+scaler
+        # on older GPUs.
         self.use_amp = self.device.type == 'cuda'
+        self.amp_dtype = torch.float32  # default: no AMP
+        self.scaler = None
         if self.use_amp:
-            self.scaler = torch.amp.GradScaler('cuda')
-            print("  AMP enabled (float16 on CUDA)")
+            if torch.cuda.is_bf16_supported():
+                self.amp_dtype = torch.bfloat16
+                print("  AMP enabled (bfloat16 on CUDA — no scaler needed)")
+            else:
+                self.amp_dtype = torch.float16
+                self.scaler = torch.amp.GradScaler('cuda')
+                print("  AMP enabled (float16 on CUDA — GradScaler active)")
 
         # Checkpoint dir (can be overridden, e.g. to Google Drive)
         if checkpoint_dir:
@@ -147,6 +157,13 @@ class Trainer:
         else:
             self.ckpt_dir = self.project_dir / 'checkpoints' / phase
         self.ckpt_dir.mkdir(parents=True, exist_ok=True)
+
+        # Rolling snapshot for NaN rollback
+        self._snapshot = None
+        self._snapshot_step = 0
+        self._snapshot_every = 100  # save snapshot every N steps
+        self._nan_streak = 0
+        self._nan_rollback_threshold = 5  # consecutive NaN steps before rollback
 
         # Tracking
         self.running_loss = 0.0
@@ -172,8 +189,16 @@ class Trainer:
 
         decoder_padding_mask = batch['decoder_padding_mask'].to(self.device)
 
+        # Rolling snapshot for NaN rollback
+        if (self.global_step % self._snapshot_every == 0
+                and self.global_step > self._snapshot_step):
+            import copy
+            self._snapshot = copy.deepcopy(self.model.state_dict())
+            self._snapshot_step = self.global_step
+
         # Forward (with AMP autocast on CUDA)
-        amp_ctx = torch.amp.autocast('cuda') if self.use_amp else contextlib.nullcontext()
+        amp_ctx = (torch.amp.autocast('cuda', dtype=self.amp_dtype)
+                   if self.use_amp else contextlib.nullcontext())
         with amp_ctx:
             output = self.model(
                 decoder_input_ids=decoder_input_ids,
@@ -198,9 +223,34 @@ class Trainer:
 
             total_loss = task_loss + aux_loss
 
+        # NaN detection — skip update if loss is bad
+        if torch.isnan(total_loss) or torch.isinf(total_loss):
+            self._nan_streak += 1
+            # Rollback if too many consecutive NaN steps
+            if (self._nan_streak >= self._nan_rollback_threshold
+                    and self._snapshot is not None):
+                print(f"  ⚠ {self._nan_streak} consecutive NaN steps — "
+                      f"rolling back to snapshot from step {self._snapshot_step}")
+                self.model.load_state_dict(self._snapshot)
+                self._nan_streak = 0
+            self.scheduler.step()
+            self.global_step += 1
+            self.model.global_step = self.global_step
+            grad_norm = float('nan')
+            return {
+                'loss': float('nan'), 'aux_loss': aux_loss.item(),
+                'grad_norm': grad_norm, 'per_text_loss': {},
+                'lr': self.scheduler.get_last_lr()[0],
+                'skipped': True,
+            }
+
+        # Good step — reset NaN streak
+        self._nan_streak = 0
+
         # Backward
         self.optimizer.zero_grad()
-        if self.use_amp:
+        if self.scaler is not None:
+            # float16 path with GradScaler (older GPUs)
             self.scaler.scale(total_loss).backward()
             self.scaler.unscale_(self.optimizer)
             grad_norm = nn.utils.clip_grad_norm_(
@@ -209,6 +259,7 @@ class Trainer:
             self.scaler.step(self.optimizer)
             self.scaler.update()
         else:
+            # bfloat16 or CPU path (no scaler needed)
             total_loss.backward()
             grad_norm = nn.utils.clip_grad_norm_(
                 self.model.parameters(), self.grad_clip
@@ -320,7 +371,7 @@ class Trainer:
             'config': self.config.__dict__,
             'entropy_history': self.model.moe_manager.entropy_history,
         }
-        if self.use_amp:
+        if self.scaler is not None:
             ckpt['scaler_state_dict'] = self.scaler.state_dict()
         if extra:
             ckpt.update(extra)
@@ -340,7 +391,7 @@ class Trainer:
         self.optimizer.load_state_dict(ckpt['optimizer_state_dict'])
         self.scheduler.load_state_dict(ckpt['scheduler_state_dict'])
         self.global_step = ckpt['global_step']
-        if self.use_amp and 'scaler_state_dict' in ckpt:
+        if self.scaler is not None and 'scaler_state_dict' in ckpt:
             self.scaler.load_state_dict(ckpt['scaler_state_dict'])
         print(f"  Loaded checkpoint from step {self.global_step}")
 

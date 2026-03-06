@@ -35,13 +35,20 @@ class ModelConfig:
     n_dec_layers: int = 4
 
     # MoE
-    n_experts: int = 2  # total experts per MoE layer
+    n_experts: int = 2  # routed experts per MoE layer
     n_type_a: int = 1  # encoder-decoder experts (n_type_b = n_experts - n_type_a)
-    top_k: int = 1
-    capacity_factor_train: float = 1.25
-    capacity_factor_eval: float = 2.0
-    aux_loss_weight: float = 0.01  # load balancing
-    router_z_loss_weight: float = 0.001
+    top_k: int = 1  # vestigial (v2 uses ReLU routing)
+    capacity_factor_train: float = 1.25  # vestigial (v2 uses natural ReLU sparsity)
+    capacity_factor_eval: float = 2.0  # vestigial
+    aux_loss_weight: float = 0.0  # balance loss disabled in v2
+    router_z_loss_weight: float = 0.0  # z-loss disabled by default in v2
+
+    # SSM (Mamba-2 SSD blocks)
+    ssm_d_state: int = 16
+    ssm_dt_rank: int = 16
+
+    # Shared expert FFN width (always-on, 4x d_model)
+    d_ff_shared: int = 1024
 
     # Sequence
     context_len: int = 512
@@ -69,37 +76,64 @@ class ModelConfig:
 
     def estimate_params(self) -> dict:
         """Estimate total parameter count by component."""
+        d = self.d_model
+        d_ff_routed = self.d_ff  # routed expert FFN width (2x d_model in v2 tiny)
+
         # Factored embeddings (shared encoder/decoder, weight-tied with LM head)
         embed = self.embedding_params
 
         # Encoder layers: self-attn + FFN + 2 layer norms
-        enc_attn = self.d_model * self.d_model * 4  # Q, K, V, O projections
-        enc_ffn = self.d_model * self.d_ff * 2  # up + down
-        enc_norm = self.d_model * 4  # 2 norms × (weight + bias)
+        enc_attn = d * d * 4  # Q, K, V, O projections
+        enc_ffn = d * self.d_ff_shared * 2  # encoder uses full-width FFN
+        enc_norm = d * 4  # 2 norms × (weight + bias)
         enc_total = (enc_attn + enc_ffn + enc_norm) * self.n_enc_layers
 
-        # Decoder MoE layers
-        # Self-attention (shared across experts in a layer)
-        dec_self_attn = self.d_model * self.d_model * 4
-        dec_self_norm = self.d_model * 2
+        # Decoder MoE layers (v2: Hymba fusion + shared expert + routed experts)
 
-        # Type A expert: cross-attn + FFN + 2 norms
-        type_a_cross_attn = self.d_model * self.d_model * 4  # Q, K, V, O
-        type_a_ffn = self.d_model * self.d_ff * 2
-        type_a_norm = self.d_model * 4  # cross-attn norm + FFN norm
+        # SSM (Mamba-2 SSD block) per layer
+        # in_proj: d * (d + d + 2*d_state*n_heads + dt_rank)
+        n_heads = self.n_heads
+        d_state = self.ssm_d_state
+        dt_rank = self.ssm_dt_rank
+        ssm_in = d * (d + d + 2 * d_state * n_heads + dt_rank)
+        ssm_dt = dt_rank * d  # dt_proj
+        ssm_out = d * d  # out_proj
+        ssm_misc = n_heads + n_heads + d  # A_log + D + RMSNorm
+        ssm_per_layer = ssm_in + ssm_dt + ssm_out + ssm_misc
+
+        # Causal self-attention per layer
+        dec_self_attn = d * d * 4  # Q, K, V, O
+
+        # Hymba norm + learnable gates
+        hymba_norm = d * 2  # LayerNorm weight + bias
+        hymba_gates = d * 2  # beta_ssm + beta_attn
+
+        # Shared expert (always-on, 4x FFN)
+        shared_expert = (d * self.d_ff_shared * 2  # up + down projections
+                         + d * 2)  # LayerNorm
+
+        # Routed Type A expert: cross-attn + FFN + 2 norms
+        type_a_cross_attn = d * d * 4
+        type_a_ffn = d * d_ff_routed * 2
+        type_a_norm = d * 4
         type_a_per_expert = type_a_cross_attn + type_a_ffn + type_a_norm
 
-        # Type B expert: FFN + 1 norm
-        type_b_ffn = self.d_model * self.d_ff * 2
-        type_b_norm = self.d_model * 2
+        # Routed Type B expert: FFN + 1 norm
+        type_b_ffn = d * d_ff_routed * 2
+        type_b_norm = d * 2
         type_b_per_expert = type_b_ffn + type_b_norm
 
-        # Router per layer: (d_model + 1) × n_experts
-        router_per_layer = (self.d_model + 1) * self.n_experts
+        # Router per layer
+        enc_signal_dim = max(d // 4, 1)
+        router_per_layer = (1 * enc_signal_dim  # enc_signal_proj
+                            + enc_signal_dim * 2  # enc_signal_norm
+                            + (d + enc_signal_dim) * self.n_experts  # gate (with bias)
+                            + self.n_experts)  # gate bias
 
         # Total per decoder layer
         dec_per_layer = (
-            dec_self_attn + dec_self_norm +
+            ssm_per_layer + dec_self_attn + hymba_norm + hymba_gates +
+            shared_expert +
             type_a_per_expert * self.n_type_a +
             type_b_per_expert * self.n_type_b_computed +
             router_per_layer
@@ -107,7 +141,7 @@ class ModelConfig:
         dec_total = dec_per_layer * self.n_dec_layers
 
         # Final layer norm
-        final_norm = self.d_model * 2
+        final_norm = d * 2
 
         # LM head is weight-tied with embedding, so not counted
         total = embed + enc_total + dec_total + final_norm
@@ -116,6 +150,9 @@ class ModelConfig:
             'embedding': embed,
             'encoder': enc_total,
             'decoder': dec_total,
+            'decoder_per_layer': dec_per_layer,
+            'ssm_per_layer': ssm_per_layer,
+            'shared_expert_per_layer': shared_expert,
             'final_norm': final_norm,
             'total': total,
             'total_M': total / 1e6,
@@ -144,19 +181,24 @@ class ModelConfig:
 
 
 def TinyConfig(**overrides) -> ModelConfig:
-    """4-8M params. Mac M-series trainable. For architecture validation."""
+    """~13M params. Mac M-series trainable. v2: Hymba SSM+Attn, ReLU routing, shared expert."""
     defaults = dict(
         d_model=256,
-        d_ff=1024,
+        d_ff=512,             # routed expert FFN (2x d_model, was 1024)
         n_heads=4,
         n_enc_layers=2,
-        n_dec_layers=4,
+        n_dec_layers=6,       # was 4
         n_experts=2,
         n_type_a=1,
-        top_k=1,
+        top_k=1,              # vestigial
         context_len=512,
         dropout=0.1,
         gradient_checkpointing=False,
+        d_ff_shared=1024,     # shared expert (4x d_model)
+        ssm_d_state=16,
+        ssm_dt_rank=16,
+        aux_loss_weight=0.0,          # balance loss disabled
+        router_z_loss_weight=0.0,     # z-loss disabled by default
     )
     defaults.update(overrides)
     return ModelConfig(**defaults)

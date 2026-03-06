@@ -36,6 +36,7 @@ def main():
     parser.add_argument('--preset', choices=['tiny', 'small'], default='tiny')
     parser.add_argument('--batch-size', type=int, default=32)
     parser.add_argument('--total-steps', type=int, default=50000)
+    parser.add_argument('--checkpoint-every', type=int, default=1000)
     parser.add_argument('--lr', type=float, default=None)
     parser.add_argument('--resume', type=str, default=None,
                         help="Checkpoint path or 'latest'")
@@ -50,7 +51,7 @@ def main():
 
     # Default LR by preset
     if args.lr is None:
-        args.lr = 1e-4 if args.preset == 'tiny' else 3e-5
+        args.lr = 3e-5 if args.preset == 'tiny' else 1e-5
 
     print(f"Phase 1 — {args.preset} model")
     params = config.estimate_params()
@@ -85,6 +86,7 @@ def main():
         model, config, str(PROJECT_DIR),
         lr=args.lr,
         total_steps=args.total_steps,
+        checkpoint_every=args.checkpoint_every,
         use_wandb=not args.no_wandb,
         wandb_run_name=f'phase1-{args.preset}',
         phase='phase1',

@@ -20,6 +20,7 @@ import random
 from pathlib import Path
 from typing import Optional, Dict, List
 
+import numpy as np
 import torch
 from torch.utils.data import Dataset
 from tokenizers import Tokenizer
@@ -144,22 +145,41 @@ class CorpusDataset(Dataset):
                 print(f"Loaded {n_overrides} sampling weight overrides")
 
     def _load_texts(self, held_out_texts: Optional[set] = None):
-        """Load cleaned texts and tokenize them."""
+        """Load texts from pre-tokenized numpy cache (or tokenize on the fly as fallback).
+
+        The numpy cache stores token IDs as uint16 arrays (~77MB for 38M tokens),
+        vs ~1.4GB as Python lists. Run `python -m data.pretokenize` to build the cache.
+        """
+        cache_dir = self.project_dir / 'data' / 'token_cache'
+        manifest_path = cache_dir / 'manifest.json'
+        use_cache = manifest_path.exists()
+
+        if use_cache:
+            with open(manifest_path) as f:
+                manifest = json.load(f)
+
         cleaned_dir = self.project_dir / 'cleaned'
-        self.texts = []  # list of dicts with name, token_ids, author_token_id, difficulty, category
+        self.texts = []
 
         for f in sorted(cleaned_dir.glob('*.txt')):
             name = f.stem
             if held_out_texts and name in held_out_texts:
                 continue
 
-            text = f.read_text(encoding='utf-8')
-            encoding = self.tokenizer.encode(text)
-            # Strip BOS/EOS added by post-processor for raw token storage
-            token_ids = [t for t in encoding.ids
-                         if t not in (self.bos_id, self.eos_id)]
+            if use_cache and name in manifest:
+                # Load from numpy cache — stays as numpy array, not Python list
+                npy_path = cache_dir / manifest[name]['file']
+                token_ids = np.load(str(npy_path))
+                n_tokens = len(token_ids)
+            else:
+                # Fallback: tokenize on the fly
+                text = f.read_text(encoding='utf-8')
+                encoding = self.tokenizer.encode(text)
+                token_ids = [t for t in encoding.ids
+                             if t not in (self.bos_id, self.eos_id)]
+                n_tokens = len(token_ids)
 
-            if len(token_ids) < 10:
+            if n_tokens < 10:
                 continue
 
             # Look up author token
@@ -174,11 +194,12 @@ class CorpusDataset(Dataset):
                 'token_ids': token_ids,
                 'author_token_id': author_token_id,
                 'difficulty': diff,
-                'n_tokens': len(token_ids),
+                'n_tokens': n_tokens,
             })
 
+        source = "numpy cache" if use_cache else "tokenizer (no cache)"
         print(f"Loaded {len(self.texts)} texts "
-              f"({sum(t['n_tokens'] for t in self.texts):,} tokens)")
+              f"({sum(t['n_tokens'] for t in self.texts):,} tokens) from {source}")
 
     def _init_curriculum_weights(self):
         """Initialize sampling weights based on difficulty scores and overrides."""
@@ -295,12 +316,13 @@ class CorpusDataset(Dataset):
         idx = random.choices(range(len(self.texts)), weights=weights, k=1)[0]
         return self.texts[idx]
 
-    def _extract_window(self, token_ids: List[int], max_len: int) -> List[int]:
-        """Extract a random context window from token IDs."""
+    def _extract_window(self, token_ids, max_len: int) -> List[int]:
+        """Extract a random context window from token IDs (list or numpy array)."""
         if len(token_ids) <= max_len:
-            return list(token_ids)
+            return token_ids.tolist() if isinstance(token_ids, np.ndarray) else list(token_ids)
         start = random.randint(0, len(token_ids) - max_len)
-        return token_ids[start:start + max_len]
+        chunk = token_ids[start:start + max_len]
+        return chunk.tolist() if isinstance(chunk, np.ndarray) else list(chunk)
 
     def _get_donor_text(self, exclude_name: str) -> List[int]:
         """Get token IDs from a different text for cross-text corruption."""
@@ -308,7 +330,8 @@ class CorpusDataset(Dataset):
         if not candidates:
             return []
         donor = random.choice(candidates)
-        return donor['token_ids']
+        ids = donor['token_ids']
+        return ids.tolist() if isinstance(ids, np.ndarray) else list(ids)
 
     def __len__(self):
         return self.samples_per_epoch
