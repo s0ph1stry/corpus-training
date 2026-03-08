@@ -453,20 +453,42 @@ class Trainer:
                          Use when changing hyperparameters like LR between runs.
         """
         ckpt = torch.load(path, map_location=self.device, weights_only=False)
-        self.model.load_state_dict(ckpt['model_state_dict'])
         self.global_step = ckpt['global_step']
 
-        if not weights_only:
+        if weights_only:
+            # Lenient loading: allow missing keys (new modules) and size mismatches
+            state_dict = ckpt['model_state_dict']
+            model_state = self.model.state_dict()
+
+            # Handle embedding/lm_head size mismatches (vocab expansion)
+            for key in list(state_dict.keys()):
+                if key in model_state and state_dict[key].shape != model_state[key].shape:
+                    old_shape = state_dict[key].shape
+                    new_shape = model_state[key].shape
+                    print(f"  Resizing {key}: {list(old_shape)} → {list(new_shape)}")
+                    # Copy old weights into the new (larger) tensor
+                    new_param = model_state[key].clone()
+                    slices = tuple(slice(0, min(o, n)) for o, n in zip(old_shape, new_shape))
+                    new_param[slices] = state_dict[key][slices]
+                    state_dict[key] = new_param
+
+            missing, unexpected = self.model.load_state_dict(state_dict, strict=False)
+            if missing:
+                print(f"  New modules (randomly initialized): {len(missing)} keys")
+            if unexpected:
+                print(f"  Dropped from checkpoint: {len(unexpected)} keys")
+
+            # Fast-forward scheduler to the resumed step
+            for _ in range(self.global_step):
+                self.scheduler.step()
+            print(f"  Loaded model weights from step {self.global_step} (fresh optimizer/scheduler)")
+        else:
+            self.model.load_state_dict(ckpt['model_state_dict'])
             self.optimizer.load_state_dict(ckpt['optimizer_state_dict'])
             self.scheduler.load_state_dict(ckpt['scheduler_state_dict'])
             if self.scaler is not None and 'scaler_state_dict' in ckpt:
                 self.scaler.load_state_dict(ckpt['scaler_state_dict'])
             print(f"  Loaded checkpoint from step {self.global_step}")
-        else:
-            # Fast-forward scheduler to the resumed step
-            for _ in range(self.global_step):
-                self.scheduler.step()
-            print(f"  Loaded model weights from step {self.global_step} (fresh optimizer/scheduler)")
 
     def resurrect_dead_experts(self, threshold: float = 0.01, n_samples: int = 32):
         """Detect and re-initialize dead routed experts.
