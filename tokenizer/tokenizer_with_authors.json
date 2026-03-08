@@ -2196,6 +2196,33 @@
       "rstrip": false,
       "normalized": false,
       "special": true
+    },
+    {
+      "id": 16236,
+      "content": "<mode_c>",
+      "single_word": false,
+      "lstrip": false,
+      "rstrip": false,
+      "normalized": true,
+      "special": false
+    },
+    {
+      "id": 16237,
+      "content": "<mode_d>",
+      "single_word": false,
+      "lstrip": false,
+      "rstrip": false,
+      "normalized": false,
+      "special": true
+    },
+    {
+      "id": 16238,
+      "content": "<mode_k>",
+      "single_word": false,
+      "lstrip": false,
+      "rstrip": false,
+      "normalized": false,
+      "special": true
     }
   ],
   "normalizer": null,

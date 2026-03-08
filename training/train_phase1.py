@@ -78,6 +78,8 @@ def main():
         batch_size=args.batch_size,
         held_out=held_out,
         total_steps=args.total_steps,
+        enable_continuation=getattr(config, 'enable_continuation', False),
+        enable_cross_text=getattr(config, 'enable_cross_text', False),
     )
 
     # Model
@@ -115,7 +117,14 @@ def main():
     print(f"\nStarting Phase 1 training ({args.total_steps} steps)")
     print(f"  Batch size: {args.batch_size}")
     print(f"  LR: {args.lr}")
-    print(f"  Annealed mode forcing: R=80%→50%, S=10%→25%, X=10%→25%")
+    has_c = getattr(config, 'enable_continuation', False)
+    has_dk = getattr(config, 'enable_cross_text', False)
+    if has_c and has_dk:
+        print(f"  Annealed modes: R=80%→~25%, S=10%→20%, X=10%→15%, C=0%→15%, D=0%→12%, K=0%→10%")
+    elif has_c:
+        print(f"  Annealed modes: R=80%→35%, S=10%→25%, X=10%→25%, C=0%→15%")
+    else:
+        print(f"  Annealed modes: R=80%→50%, S=10%→25%, X=10%→25%")
     print(f"  Router jitter: {config.router_jitter_noise}, liveness floor: {config.liveness_min_frac}")
     print()
 

@@ -216,7 +216,10 @@ class Router(nn.Module):
     MODE_R = 0
     MODE_S = 1
     MODE_X = 2
-    N_MODES = 3
+    MODE_C = 3
+    MODE_D = 4
+    MODE_K = 5
+    N_MODES = 6
 
     def __init__(self, config: ModelConfig):
         super().__init__()

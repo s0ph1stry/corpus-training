@@ -33,6 +33,9 @@ PAD_ID = None
 MODE_R_ID = None
 MODE_S_ID = None
 MODE_X_ID = None
+MODE_C_ID = None
+MODE_D_ID = None
+MODE_K_ID = None
 
 
 @dataclass
@@ -49,7 +52,7 @@ class UL2Mode:
 def init_special_tokens(tokenizer):
     """Initialize special token IDs from a loaded tokenizer."""
     global MASK_ID, CORRUPT_START_ID, CORRUPT_END_ID, BOS_ID, EOS_ID, PAD_ID
-    global MODE_R_ID, MODE_S_ID, MODE_X_ID
+    global MODE_R_ID, MODE_S_ID, MODE_X_ID, MODE_C_ID, MODE_D_ID, MODE_K_ID
     MASK_ID = tokenizer.token_to_id("<mask>")
     CORRUPT_START_ID = tokenizer.token_to_id("<corrupt>")
     # <corrupt> is used for both start and end markers
@@ -60,6 +63,9 @@ def init_special_tokens(tokenizer):
     MODE_R_ID = tokenizer.token_to_id("<mode_r>")
     MODE_S_ID = tokenizer.token_to_id("<mode_s>")
     MODE_X_ID = tokenizer.token_to_id("<mode_x>")
+    MODE_C_ID = tokenizer.token_to_id("<mode_c>")  # may be None if tokenizer predates v2.5
+    MODE_D_ID = tokenizer.token_to_id("<mode_d>")  # may be None if tokenizer predates v2.6
+    MODE_K_ID = tokenizer.token_to_id("<mode_k>")  # may be None if tokenizer predates v2.6
 
 
 def corruption_rate(step: int, total_steps: int,
@@ -462,31 +468,66 @@ PHASE2_MODE_RATIOS = {
 
 
 def sample_ul2_mode(step: int, total_steps: int,
-                    phase: str = 'phase1') -> str:
-    """Sample a UL2 denoiser mode (R, S, or X).
+                    phase: str = 'phase1',
+                    enable_continuation: bool = False,
+                    enable_cross_text: bool = False) -> str:
+    """Sample a UL2 denoiser mode (R, S, X, C, D, K).
 
     Phase 1 with annealing: Start R-heavy (easy: encoder available) and gradually
     shift toward the target ratios. This gives the router a curriculum — learn
     reconstruction first, then handle generation.
 
-    Early (step 0):    R=80%, S=10%, X=10%
-    Late  (step end):  R=50%, S=25%, X=25%  (= DEFAULT_MODE_RATIOS)
+    Base trajectory (no extra modes):
+      Early (step 0):    R=80%, S=10%, X=10%
+      Late  (step end):  R=50%, S=25%, X=25%
+
+    With continuation (C-mode, onset 10%):
+      C ramps 0% → 15% by end. R gives up share.
+
+    With cross-text modes (D/K, onset 15%):
+      D ramps 0% → 12% by end. K ramps 0% → 10% by end. R gives up share.
 
     Phase 2: Heavy S-mode generation with R/X maintenance denoising.
     """
     if phase == 'phase2':
         ratios = PHASE2_MODE_RATIOS
     else:
-        # Anneal from R-heavy start to balanced target
         progress = min(step / max(total_steps, 1), 1.0)
-        # Cubic easing — stay R-heavy longer, then shift
+        # Quadratic easing — stay R-heavy longer, then shift
         t = progress ** 2
+
+        # Base trajectory: R/S/X
         start = {'R': 0.80, 'S': 0.10, 'X': 0.10}
-        end = DEFAULT_MODE_RATIOS
+        end_base = DEFAULT_MODE_RATIOS
         ratios = {
-            mode: start[mode] + t * (end[mode] - start[mode])
+            mode: start[mode] + t * (end_base[mode] - start[mode])
             for mode in start
         }
+
+        # C-mode: ramps in after 10% of training
+        if enable_continuation and MODE_C_ID is not None:
+            c_onset = 0.10
+            if progress < c_onset:
+                c_frac = 0.0
+            else:
+                c_progress = (progress - c_onset) / (1.0 - c_onset)
+                c_frac = 0.15 * c_progress  # 0% → 15%
+            ratios['R'] = max(ratios['R'] - c_frac, 0.10)
+            ratios['C'] = c_frac
+
+        # D-mode (same author) and K-mode (cross author): ramp after 15%
+        if enable_cross_text and MODE_D_ID is not None and MODE_K_ID is not None:
+            dk_onset = 0.15
+            if progress < dk_onset:
+                d_frac = 0.0
+                k_frac = 0.0
+            else:
+                dk_progress = (progress - dk_onset) / (1.0 - dk_onset)
+                d_frac = 0.12 * dk_progress  # 0% → 12%
+                k_frac = 0.10 * dk_progress  # 0% → 10%
+            ratios['R'] = max(ratios['R'] - d_frac - k_frac, 0.10)
+            ratios['D'] = d_frac
+            ratios['K'] = k_frac
 
     modes = list(ratios.keys())
     weights = list(ratios.values())
@@ -529,6 +570,36 @@ def get_ul2_corruption_config(mode: str, step: int, total_steps: int) -> dict:
                 'span_deletion': 0.4,  # noise injection, harder
                 'cross_text_insert': 0.3,
             },
+        }
+    elif mode == 'C':
+        # Continuation: encoder = previous chunk, decoder = next chunk (autoregressive)
+        # No corruption on the decoder — pure next-token prediction with cross-window context
+        return {
+            'mode_token_id': MODE_C_ID,
+            'encoder_available': True,
+            'corruption_rate': 0.0,
+            'avg_span_length': 0,
+            'strategy_weights': {},
+        }
+    elif mode == 'D':
+        # Dialogue: encoder = text A by author, decoder = text B by same author
+        # Cross-attention learns authorial identity across works
+        return {
+            'mode_token_id': MODE_D_ID,
+            'encoder_available': True,
+            'corruption_rate': 0.0,
+            'avg_span_length': 0,
+            'strategy_weights': {},
+        }
+    elif mode == 'K':
+        # Kontrastive: encoder = text by author A, decoder = text by author B
+        # Cross-attention navigates stylistic mismatch, learns topic vs voice
+        return {
+            'mode_token_id': MODE_K_ID,
+            'encoder_available': True,
+            'corruption_rate': 0.0,
+            'avg_span_length': 0,
+            'strategy_weights': {},
         }
     else:  # S-mode
         # Sequential: no corruption, autoregressive

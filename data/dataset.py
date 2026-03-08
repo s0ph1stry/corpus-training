@@ -28,7 +28,7 @@ from tokenizers import Tokenizer
 from data.corruption import (
     init_special_tokens, corruption_rate, sample_strategy,
     apply_corruption, sample_ul2_mode, get_ul2_corruption_config,
-    sample_strategy_for_mode,
+    sample_strategy_for_mode, MODE_C_ID, MODE_D_ID, MODE_K_ID,
 )
 
 
@@ -48,7 +48,9 @@ class CorpusDataset(Dataset):
                  samples_per_epoch: int = 100000,
                  curriculum_warmup_frac: float = 0.15,
                  total_steps: int = 50000,
-                 held_out_texts: Optional[set] = None):
+                 held_out_texts: Optional[set] = None,
+                 enable_continuation: bool = False,
+                 enable_cross_text: bool = False):
         """
         Args:
             project_dir: path to corpus-training/
@@ -58,6 +60,8 @@ class CorpusDataset(Dataset):
             curriculum_warmup_frac: fraction of training for curriculum pacing
             total_steps: total training steps for corruption schedule
             held_out_texts: set of text names to exclude (eval set)
+            enable_continuation: enable C-mode (cross-window continuation)
+            enable_cross_text: enable D-mode (same author) and K-mode (cross author)
         """
         self.project_dir = Path(project_dir)
         self.mode = mode
@@ -65,6 +69,8 @@ class CorpusDataset(Dataset):
         self.samples_per_epoch = samples_per_epoch
         self.curriculum_warmup_frac = curriculum_warmup_frac
         self.total_steps = total_steps
+        self.enable_continuation = enable_continuation
+        self.enable_cross_text = enable_cross_text
 
         # Load tokenizer (with author tokens)
         tok_path = self.project_dir / 'tokenizer' / 'tokenizer_with_authors.json'
@@ -104,6 +110,9 @@ class CorpusDataset(Dataset):
 
         # Load and tokenize all texts
         self._load_texts(held_out_texts)
+
+        # Build author-to-texts index for D-mode (same author, different text)
+        self._build_author_index()
 
         # Initialize curriculum weights
         self._init_curriculum_weights()
@@ -324,6 +333,208 @@ class CorpusDataset(Dataset):
         chunk = token_ids[start:start + max_len]
         return chunk.tolist() if isinstance(chunk, np.ndarray) else list(chunk)
 
+    def _extract_consecutive_windows(self, token_ids, max_len: int):
+        """Extract two consecutive non-overlapping windows from token IDs.
+
+        Returns (prev_chunk, current_chunk). If the text is too short for
+        two full windows, returns shorter chunks or falls back to a single
+        window split in half.
+        """
+        total = len(token_ids)
+        need = max_len * 2
+
+        if total >= need:
+            # Plenty of room — random start with two full windows
+            start = random.randint(0, total - need)
+            prev = token_ids[start:start + max_len]
+            curr = token_ids[start + max_len:start + need]
+        else:
+            # Text shorter than 2 windows — split what we have
+            mid = total // 2
+            prev = token_ids[:mid]
+            curr = token_ids[mid:]
+
+        if isinstance(prev, np.ndarray):
+            prev = prev.tolist()
+        if isinstance(curr, np.ndarray):
+            curr = curr.tolist()
+        return prev, curr
+
+    def _get_continuation_sample(self, text: dict, mode_config: dict) -> dict:
+        """C-mode: encoder = previous chunk, decoder continues next chunk.
+
+        The encoder provides cross-window context. The decoder does autoregressive
+        next-token prediction on the continuation. Type A experts cross-attend
+        to the previous chunk; Type B experts handle local generation.
+        """
+        # Reserve space for mode token + author token
+        max_content = self.context_len - 3
+
+        prev_chunk, curr_chunk = self._extract_consecutive_windows(
+            text['token_ids'], max_content
+        )
+
+        # Prepend author token to both chunks
+        if text['author_token_id'] is not None:
+            prev_chunk = [text['author_token_id']] + prev_chunk
+            curr_chunk = [text['author_token_id']] + curr_chunk
+
+        # Encoder input: [<mode_c>] + prev_chunk (clean, provides context)
+        encoder_input = [mode_config['mode_token_id']] + prev_chunk
+
+        # Decoder: autoregressive on current chunk
+        # [<mode_c>] + curr_chunk, shifted for next-token prediction
+        decoder_seq = [mode_config['mode_token_id']] + curr_chunk
+        input_ids = decoder_seq[:-1]
+        target_ids = decoder_seq[1:]
+
+        encoder_input = self._pad_or_truncate(encoder_input, self.context_len)
+        input_ids = self._pad_or_truncate(input_ids, self.context_len)
+        target_ids = self._pad_or_truncate(target_ids, self.context_len)
+
+        return {
+            'encoder_input': torch.tensor(encoder_input, dtype=torch.long),
+            'decoder_input': torch.tensor(input_ids, dtype=torch.long),
+            'decoder_target': torch.tensor(target_ids, dtype=torch.long),
+            'encoder_available': torch.tensor(1.0),
+            'text_name': text['name'],
+            'ul2_mode': 'C',
+        }
+
+    def _build_author_index(self):
+        """Build mapping from author_token_id to list of text indices.
+
+        Used by D-mode (same author, different text) to find pairs.
+        Authors with only 1 text can't be used for D-mode.
+        """
+        self.author_to_texts = {}  # author_token_id -> [text_index, ...]
+        self.multi_author_ids = []  # author_token_ids with 2+ texts
+
+        for idx, text in enumerate(self.texts):
+            aid = text['author_token_id']
+            if aid is not None:
+                self.author_to_texts.setdefault(aid, []).append(idx)
+
+        self.multi_author_ids = [
+            aid for aid, indices in self.author_to_texts.items()
+            if len(indices) >= 2
+        ]
+
+        n_multi = len(self.multi_author_ids)
+        n_texts_with_pair = sum(len(self.author_to_texts[a]) for a in self.multi_author_ids)
+        print(f"Author index: {n_multi} authors with 2+ texts "
+              f"({n_texts_with_pair} texts available for D-mode)")
+
+    def _get_dialogue_sample(self, text: dict, mode_config: dict) -> dict:
+        """D-mode: encoder = text A by author, decoder = text B by same author.
+
+        Cross-attention learns authorial identity across works.
+        If the text's author has only 1 text, falls back to C-mode.
+        """
+        aid = text['author_token_id']
+
+        # Find a different text by the same author
+        if aid is not None and aid in self.author_to_texts and len(self.author_to_texts[aid]) >= 2:
+            candidates = [
+                idx for idx in self.author_to_texts[aid]
+                if self.texts[idx]['name'] != text['name']
+            ]
+            if candidates:
+                other_idx = random.choice(candidates)
+                other_text = self.texts[other_idx]
+            else:
+                # Fallback: use continuation within same text
+                return self._get_continuation_sample(text, mode_config)
+        else:
+            # Author has only 1 text — fall back to continuation
+            return self._get_continuation_sample(text, mode_config)
+
+        max_content = self.context_len - 3
+
+        # Encoder: window from the OTHER text by same author
+        enc_window = self._extract_window(other_text['token_ids'], max_content)
+        # Decoder: window from the sampled text
+        dec_window = self._extract_window(text['token_ids'], max_content)
+
+        # Prepend author token to both (same author)
+        if aid is not None:
+            enc_window = [aid] + enc_window
+            dec_window = [aid] + dec_window
+
+        # Encoder input: [<mode_d>] + enc_window
+        encoder_input = [mode_config['mode_token_id']] + enc_window
+
+        # Decoder: autoregressive on dec_window
+        decoder_seq = [mode_config['mode_token_id']] + dec_window
+        input_ids = decoder_seq[:-1]
+        target_ids = decoder_seq[1:]
+
+        encoder_input = self._pad_or_truncate(encoder_input, self.context_len)
+        input_ids = self._pad_or_truncate(input_ids, self.context_len)
+        target_ids = self._pad_or_truncate(target_ids, self.context_len)
+
+        return {
+            'encoder_input': torch.tensor(encoder_input, dtype=torch.long),
+            'decoder_input': torch.tensor(input_ids, dtype=torch.long),
+            'decoder_target': torch.tensor(target_ids, dtype=torch.long),
+            'encoder_available': torch.tensor(1.0),
+            'text_name': text['name'],
+            'ul2_mode': 'D',
+        }
+
+    def _get_contrastive_sample(self, text: dict, mode_config: dict) -> dict:
+        """K-mode: encoder = text by author A, decoder = text by author B.
+
+        Cross-attention navigates stylistic mismatch. The encoder provides
+        topical context but the decoder must generate in a different register.
+        Teaches what's topic (shared across authors) vs what's voice (author-specific).
+        """
+        # Find a text by a DIFFERENT author
+        text_aid = text['author_token_id']
+        candidates = [
+            t for t in self.texts
+            if t['author_token_id'] != text_aid and t['name'] != text['name']
+        ]
+
+        if not candidates:
+            # Only one author in corpus — fall back to continuation
+            return self._get_continuation_sample(text, mode_config)
+
+        other_text = random.choice(candidates)
+        max_content = self.context_len - 3
+
+        # Encoder: window from OTHER author's text
+        enc_window = self._extract_window(other_text['token_ids'], max_content)
+        # Decoder: window from the sampled text
+        dec_window = self._extract_window(text['token_ids'], max_content)
+
+        # Prepend RESPECTIVE author tokens
+        if other_text['author_token_id'] is not None:
+            enc_window = [other_text['author_token_id']] + enc_window
+        if text_aid is not None:
+            dec_window = [text_aid] + dec_window
+
+        # Encoder input: [<mode_k>] + enc_window (author B's text)
+        encoder_input = [mode_config['mode_token_id']] + enc_window
+
+        # Decoder: autoregressive on author A's text
+        decoder_seq = [mode_config['mode_token_id']] + dec_window
+        input_ids = decoder_seq[:-1]
+        target_ids = decoder_seq[1:]
+
+        encoder_input = self._pad_or_truncate(encoder_input, self.context_len)
+        input_ids = self._pad_or_truncate(input_ids, self.context_len)
+        target_ids = self._pad_or_truncate(target_ids, self.context_len)
+
+        return {
+            'encoder_input': torch.tensor(encoder_input, dtype=torch.long),
+            'decoder_input': torch.tensor(input_ids, dtype=torch.long),
+            'decoder_target': torch.tensor(target_ids, dtype=torch.long),
+            'encoder_available': torch.tensor(1.0),
+            'text_name': text['name'],
+            'ul2_mode': 'K',
+        }
+
     def _get_donor_text(self, exclude_name: str) -> List[int]:
         """Get token IDs from a different text for cross-text corruption."""
         candidates = [t for t in self.texts if t['name'] != exclude_name]
@@ -350,20 +561,30 @@ class CorpusDataset(Dataset):
         return self.mode.split('_')[0]
 
     def _get_denoise_sample(self) -> dict:
-        """UL2-style denoising sample. Samples R/S/X mode, prepends mode token.
+        """UL2-style denoising sample. Samples R/S/X/C mode, prepends mode token.
 
         R-mode: short spans, low corruption → encoder_available=True
         S-mode: autoregressive, no corruption → encoder_available=False
         X-mode: high corruption, long spans → encoder_available=True
+        C-mode: continuation, encoder=previous chunk → encoder_available=True
         """
         # Sample UL2 mode
         mode = sample_ul2_mode(self._current_step, self.total_steps,
-                               phase=self.mode.split('_')[0])
+                               phase=self.mode.split('_')[0],
+                               enable_continuation=self.enable_continuation,
+                               enable_cross_text=self.enable_cross_text)
         mode_config = get_ul2_corruption_config(
             mode, self._current_step, self.total_steps
         )
 
         text = self._sample_text()
+
+        if mode == 'C':
+            return self._get_continuation_sample(text, mode_config)
+        elif mode == 'D':
+            return self._get_dialogue_sample(text, mode_config)
+        elif mode == 'K':
+            return self._get_contrastive_sample(text, mode_config)
 
         # Reserve space for mode token + author token
         max_content = self.context_len - 3

@@ -18,7 +18,7 @@ from pathlib import Path
 @dataclass
 class ModelConfig:
     # Embedding
-    vocab_size: int = 16233  # updated after author tokens added (202 texts, 233 author tokens + <complete>)
+    vocab_size: int = 16239  # 16000 base + 233 author tokens + <complete> + 3 mode tokens + <mode_c> + <mode_d> + <mode_k>
     embedding_inner_dim: int = 64  # factored embedding bottleneck
     pad_token_id: int = 0
 
@@ -74,6 +74,12 @@ class ModelConfig:
 
     # Sequence
     context_len: int = 512
+
+    # Cross-window continuation (v2.5): encoder = previous chunk
+    enable_continuation: bool = False  # enable C-mode in training
+
+    # Cross-text comparison modes (v2.6): D-mode (same author) and K-mode (cross author)
+    enable_cross_text: bool = False  # enable D-mode and K-mode in training
 
     # Training
     gradient_checkpointing: bool = False
@@ -236,6 +242,10 @@ def TinyConfig(**overrides) -> ModelConfig:
         similarity_n_proj=16,
         rcl_weight=0.5,               # ProMoE routing contrastive
         rcl_tau=0.07,
+        # v2.5: cross-window continuation
+        enable_continuation=True,
+        # v2.6: cross-text comparison modes
+        enable_cross_text=True,
     )
     defaults.update(overrides)
     return ModelConfig(**defaults)

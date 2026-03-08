@@ -172,10 +172,10 @@ class Trainer:
         self.running_loss = 0.0
         self.running_aux_loss = 0.0
         self.running_count = 0
-        self.running_ul2_modes = {'R': 0, 'S': 0, 'X': 0}
-        # Per-mode loss tracking (v2.3)
-        self.running_mode_loss = {'R': 0.0, 'S': 0.0, 'X': 0.0}
-        self.running_mode_count = {'R': 0, 'S': 0, 'X': 0}
+        self.running_ul2_modes = {'R': 0, 'S': 0, 'X': 0, 'C': 0, 'D': 0, 'K': 0}
+        # Per-mode loss tracking (v2.3+)
+        self.running_mode_loss = {'R': 0.0, 'S': 0.0, 'X': 0.0, 'C': 0.0, 'D': 0.0, 'K': 0.0}
+        self.running_mode_count = {'R': 0, 'S': 0, 'X': 0, 'C': 0, 'D': 0, 'K': 0}
 
     def train_step(self, batch: dict) -> dict:
         """Single training step. Returns loss dict for logging."""
@@ -356,7 +356,7 @@ class Trainer:
 
         # Per-mode average losses
         mode_losses = {}
-        for mode in ('R', 'S', 'X'):
+        for mode in ('R', 'S', 'X', 'C', 'D', 'K'):
             if self.running_mode_count[mode] > 0:
                 mode_losses[mode] = self.running_mode_loss[mode] / self.running_mode_count[mode]
 
@@ -369,7 +369,7 @@ class Trainer:
         ul2_pcts = {k: v / max(ul2_total, 1) for k, v in self.running_ul2_modes.items()}
 
         # Console — add normalized loss and per-mode losses
-        mode_str = ' '.join(f"{m}:{mode_losses[m]:.2f}" for m in ('R', 'S', 'X') if m in mode_losses)
+        mode_str = ' '.join(f"{m}:{mode_losses[m]:.2f}" for m in ('R', 'S', 'X', 'C', 'D', 'K') if m in mode_losses)
         print(f"  step {self.global_step:>6d} | "
               f"loss {avg_loss:.4f} | "
               f"norm {norm_loss:.2f} | "
@@ -401,17 +401,16 @@ class Trainer:
             expert_fracs = self.model.moe_manager.get_expert_fracs()
             log_dict.update(expert_fracs)
             # UL2 mode distribution
-            log_dict['ul2/R'] = ul2_pcts['R']
-            log_dict['ul2/S'] = ul2_pcts['S']
-            log_dict['ul2/X'] = ul2_pcts['X']
+            for m in ('R', 'S', 'X', 'C', 'D', 'K'):
+                log_dict[f'ul2/{m}'] = ul2_pcts.get(m, 0.0)
             wandb.log(log_dict, step=self.global_step)
 
         self.running_loss = 0.0
         self.running_aux_loss = 0.0
         self.running_count = 0
-        self.running_ul2_modes = {'R': 0, 'S': 0, 'X': 0}
-        self.running_mode_loss = {'R': 0.0, 'S': 0.0, 'X': 0.0}
-        self.running_mode_count = {'R': 0, 'S': 0, 'X': 0}
+        self.running_ul2_modes = {'R': 0, 'S': 0, 'X': 0, 'C': 0, 'D': 0, 'K': 0}
+        self.running_mode_loss = {'R': 0.0, 'S': 0.0, 'X': 0.0, 'C': 0.0, 'D': 0.0, 'K': 0.0}
+        self.running_mode_count = {'R': 0, 'S': 0, 'X': 0, 'C': 0, 'D': 0, 'K': 0}
 
     def save_checkpoint(self, extra: dict = None):
         """Save model checkpoint. Also checks for routing collapse."""

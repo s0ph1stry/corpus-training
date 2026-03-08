@@ -56,16 +56,19 @@ class MixedBatchCollator:
             text_names.append(sample.get('text_name', ''))
 
             if enc_avail > 0.5:
-                # Denoising sample
+                # Denoising or continuation sample (encoder_available=True)
                 enc_input = sample['encoder_input']
                 dec_target = sample['decoder_target']
 
                 encoder_input_ids[i, :len(enc_input)] = enc_input[:self.context_len]
 
-                # Decoder input = corrupted text (same as encoder input)
-                # Decoder target = clean original
-                # The model must use the encoder to reconstruct what was corrupted
-                decoder_input_ids[i, :len(enc_input)] = enc_input[:self.context_len]
+                # C-mode provides separate decoder_input (different from encoder)
+                # R/X mode: decoder input = corrupted text (same as encoder input)
+                if 'decoder_input' in sample:
+                    dec_input = sample['decoder_input']
+                    decoder_input_ids[i, :len(dec_input)] = dec_input[:self.context_len]
+                else:
+                    decoder_input_ids[i, :len(enc_input)] = enc_input[:self.context_len]
                 decoder_targets[i, :len(dec_target)] = dec_target[:self.context_len]
             else:
                 # Generative sample
@@ -83,8 +86,8 @@ class MixedBatchCollator:
         ul2_modes = [sample.get('ul2_mode', '') for sample in batch]
 
         # Convert mode strings to integer IDs for mode-conditioned routing
-        # R=0, S=1, X=2 (matches Router.MODE_R/S/X constants)
-        mode_map = {'R': 0, 'S': 1, 'X': 2}
+        # R=0, S=1, X=2, C=3 (matches Router mode constants)
+        mode_map = {'R': 0, 'S': 1, 'X': 2, 'C': 3, 'D': 4, 'K': 5}
         mode_ids = torch.tensor(
             [mode_map.get(m, 0) for m in ul2_modes], dtype=torch.long
         )
@@ -166,7 +169,9 @@ class MixedDataLoader:
 
 def create_phase1_loader(project_dir: str, config, batch_size: int = 32,
                           num_workers: int = 0, held_out: set = None,
-                          total_steps: int = 50000) -> DataLoader:
+                          total_steps: int = 50000,
+                          enable_continuation: bool = False,
+                          enable_cross_text: bool = False) -> DataLoader:
     """Create a Phase 1 (denoising) data loader."""
     dataset = CorpusDataset(
         project_dir=project_dir,
@@ -174,6 +179,8 @@ def create_phase1_loader(project_dir: str, config, batch_size: int = 32,
         context_len=config.context_len,
         total_steps=total_steps,
         held_out_texts=held_out,
+        enable_continuation=enable_continuation,
+        enable_cross_text=enable_cross_text,
     )
 
     collator = MixedBatchCollator(config.context_len, config.pad_token_id)
