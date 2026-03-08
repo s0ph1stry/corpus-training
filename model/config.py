@@ -48,6 +48,23 @@ class ModelConfig:
     liveness_min_frac: float = 0.05    # minimum expert activation fraction (5%)
     liveness_loss_weight: float = 0.1  # weight for liveness penalty
 
+    # Per-expert auxiliary heads (v2.2): expert-specific gradient signal
+    expert_aux_heads: bool = False      # enable per-expert aux prediction heads
+    expert_aux_weight: float = 0.05     # weight for expert aux loss (low — guides, doesn't dominate)
+
+    # Mode-conditioned routing (v2.3): UL2 mode biases expert selection
+    mode_conditioned_routing: bool = False  # feed mode (R/S/X) to router as learned bias
+    hard_s_mode_gate: bool = False          # structurally zero Type A weight when enc_avail=0
+
+    # Expert similarity loss (v2.4, SimSMoE): CKA between expert outputs
+    similarity_loss_weight: float = 0.0    # weight for CKA similarity loss (0 = disabled)
+    similarity_threshold: float = 0.5      # only penalize if CKA > threshold
+    similarity_n_proj: int = 16            # projection dim for CKA bottleneck
+
+    # Routing contrastive loss (v2.4, ProMoE): expert prototype coherence
+    rcl_weight: float = 0.0               # weight for routing contrastive loss (0 = disabled)
+    rcl_tau: float = 0.07                 # InfoNCE temperature
+
     # SSM (Mamba-2 SSD blocks)
     ssm_d_state: int = 16
     ssm_dt_rank: int = 16

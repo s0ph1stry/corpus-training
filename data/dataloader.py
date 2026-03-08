@@ -82,6 +82,13 @@ class MixedBatchCollator:
         # Collect UL2 mode info if available
         ul2_modes = [sample.get('ul2_mode', '') for sample in batch]
 
+        # Convert mode strings to integer IDs for mode-conditioned routing
+        # R=0, S=1, X=2 (matches Router.MODE_R/S/X constants)
+        mode_map = {'R': 0, 'S': 1, 'X': 2}
+        mode_ids = torch.tensor(
+            [mode_map.get(m, 0) for m in ul2_modes], dtype=torch.long
+        )
+
         return {
             'decoder_input_ids': decoder_input_ids,
             'decoder_targets': decoder_targets,
@@ -91,6 +98,7 @@ class MixedBatchCollator:
             'encoder_padding_mask': encoder_padding_mask if has_encoder else None,
             'text_names': text_names,
             'ul2_modes': ul2_modes,
+            'mode_ids': mode_ids,
         }
 
 

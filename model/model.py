@@ -18,6 +18,7 @@ from model.config import ModelConfig
 from model.encoder import Encoder
 from model.moe_layer import MoELayer
 from model.experts import MOEManager
+from model.expert_aux_heads import ExpertAuxHead
 
 
 class FactoredEmbedding(nn.Module):
@@ -66,8 +67,8 @@ class HeteroMoETransformer(nn.Module):
 
         # Decoder MoE stack
         self.decoder_layers = nn.ModuleList([
-            MoELayer(config, self.moe_manager)
-            for _ in range(config.n_dec_layers)
+            MoELayer(config, self.moe_manager, layer_idx=i)
+            for i in range(config.n_dec_layers)
         ])
 
         # Final layer norm
@@ -79,8 +80,22 @@ class HeteroMoETransformer(nn.Module):
         self.lm_head_vocab.weight = self.embedding.embedding.weight
         # d_model -> inner_dim: uses transposed embedding.projection in forward()
 
+        # Per-expert auxiliary heads (v2.2): shared across layers
+        self.type_a_aux_head = None
+        self.type_b_aux_head = None
+        if config.expert_aux_heads:
+            self.type_a_aux_head = ExpertAuxHead(config.d_model, config.embedding_inner_dim)
+            self.type_b_aux_head = ExpertAuxHead(config.d_model, config.embedding_inner_dim)
+
         # Initialize weights
         self.apply(self._init_weights)
+
+        # Wire up aux heads AFTER init (needs weight-tied vocab proj)
+        if config.expert_aux_heads:
+            self.type_a_aux_head.set_vocab_proj(self.lm_head_vocab)
+            self.type_b_aux_head.set_vocab_proj(self.lm_head_vocab)
+            for layer in self.decoder_layers:
+                layer.set_aux_heads(self.type_a_aux_head, self.type_b_aux_head)
 
     def _init_weights(self, module):
         if isinstance(module, nn.Linear):
@@ -100,13 +115,17 @@ class HeteroMoETransformer(nn.Module):
                 encoder_input_ids: torch.Tensor = None,
                 encoder_available: torch.Tensor = None,
                 decoder_padding_mask: torch.Tensor = None,
-                encoder_padding_mask: torch.Tensor = None) -> dict:
+                encoder_padding_mask: torch.Tensor = None,
+                decoder_targets: torch.Tensor = None,
+                mode_ids: torch.Tensor = None) -> dict:
         """
         decoder_input_ids: (batch, dec_seq_len) — token IDs for decoder
         encoder_input_ids: (batch, enc_seq_len) — token IDs for encoder (can be None)
         encoder_available: (batch,) — binary, 1 if encoder input exists for this sample
         decoder_padding_mask: (batch, dec_seq_len) — True=valid
         encoder_padding_mask: (batch, enc_seq_len) — True=valid
+        decoder_targets: (batch, dec_seq_len) — target tokens for expert aux heads
+        mode_ids: (batch,) — UL2 mode IDs (R=0, S=1, X=2) for mode-conditioned routing
 
         Returns dict with:
             logits: (batch, dec_seq_len, vocab_size)
@@ -171,6 +190,8 @@ class HeteroMoETransformer(nn.Module):
                 encoder_mask=encoder_mask,
                 padding_mask=decoder_padding_mask,
                 encoder_available=encoder_available,
+                decoder_targets=decoder_targets,
+                mode_ids=mode_ids,
             )
 
         # Final norm + LM head
@@ -185,6 +206,9 @@ class HeteroMoETransformer(nn.Module):
             global_step=self.global_step,
             z_weight=self.config.router_z_loss_weight,
             liveness_weight=self.config.liveness_loss_weight,
+            expert_aux_weight=self.config.expert_aux_weight if self.config.expert_aux_heads else 0.0,
+            similarity_weight=self.config.similarity_loss_weight,
+            rcl_weight=self.config.rcl_weight,
         )
 
         return {

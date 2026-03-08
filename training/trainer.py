@@ -173,6 +173,9 @@ class Trainer:
         self.running_aux_loss = 0.0
         self.running_count = 0
         self.running_ul2_modes = {'R': 0, 'S': 0, 'X': 0}
+        # Per-mode loss tracking (v2.3)
+        self.running_mode_loss = {'R': 0.0, 'S': 0.0, 'X': 0.0}
+        self.running_mode_count = {'R': 0, 'S': 0, 'X': 0}
 
     def train_step(self, batch: dict) -> dict:
         """Single training step. Returns loss dict for logging."""
@@ -192,6 +195,11 @@ class Trainer:
 
         decoder_padding_mask = batch['decoder_padding_mask'].to(self.device)
 
+        # Mode IDs for mode-conditioned routing (v2.3)
+        mode_ids = None
+        if batch.get('mode_ids') is not None:
+            mode_ids = batch['mode_ids'].to(self.device)
+
         # Rolling snapshot for NaN rollback
         if (self.global_step % self._snapshot_every == 0
                 and self.global_step > self._snapshot_step):
@@ -209,6 +217,8 @@ class Trainer:
                 encoder_available=encoder_available,
                 decoder_padding_mask=decoder_padding_mask,
                 encoder_padding_mask=encoder_padding_mask,
+                decoder_targets=decoder_targets,
+                mode_ids=mode_ids,
             )
 
             logits = output['logits']
@@ -287,11 +297,25 @@ class Trainer:
         self.running_aux_loss += aux_loss.item()
         self.running_count += 1
 
-        # UL2 mode tracking
+        # UL2 mode tracking + per-mode loss
         ul2_modes = batch.get('ul2_modes', [])
-        for mode in ul2_modes:
-            if mode in self.running_ul2_modes:
-                self.running_ul2_modes[mode] += 1
+        if ul2_modes:
+            # Per-sample loss for mode breakdown
+            with torch.no_grad():
+                B, S, V = logits.shape
+                per_sample = torch.nn.functional.cross_entropy(
+                    logits.detach().view(-1, V), decoder_targets.view(-1),
+                    ignore_index=-100, reduction='none'
+                ).view(B, S)
+                valid = (decoder_targets != self.config.pad_token_id) & (decoder_targets != -100)
+                per_sample_mean = (per_sample * valid.float()).sum(dim=1) / valid.float().sum(dim=1).clamp(min=1)
+
+            for i, mode in enumerate(ul2_modes):
+                if mode in self.running_ul2_modes:
+                    self.running_ul2_modes[mode] += 1
+                if mode in self.running_mode_loss and i < len(per_sample_mean):
+                    self.running_mode_loss[mode] += per_sample_mean[i].item()
+                    self.running_mode_count[mode] += 1
 
         return {
             'loss': task_loss.item(),
@@ -302,6 +326,22 @@ class Trainer:
             'per_text_loss': per_text,
         }
 
+    def expected_difficulty(self) -> float:
+        """Compute expected difficulty at current step from corruption schedule.
+
+        Difficulty = weighted average corruption rate across modes.
+        Three compounding ramps: R-corruption (15→30%), X-corruption (50→80%),
+        and mode mix (R:80→50%, S:10→25%, X:10→25% with quadratic easing).
+        """
+        progress = min(self.global_step / max(self.total_steps, 1), 1.0)
+        t = progress ** 2  # quadratic mode mix easing
+        r_frac = 0.80 - 0.30 * t
+        s_frac = 0.10 + 0.15 * t
+        x_frac = 0.10 + 0.15 * t
+        r_rate = 0.15 + 0.15 * progress
+        x_rate = 0.50 + 0.30 * progress
+        return r_frac * r_rate + s_frac * 0.0 + x_frac * x_rate
+
     def log(self, step_result: dict):
         """Log metrics to wandb and console."""
         if self.global_step % self.log_every != 0:
@@ -309,6 +349,16 @@ class Trainer:
 
         avg_loss = self.running_loss / max(self.running_count, 1)
         avg_aux = self.running_aux_loss / max(self.running_count, 1)
+
+        # Difficulty-normalized loss
+        difficulty = self.expected_difficulty()
+        norm_loss = avg_loss / max(difficulty, 1e-6)
+
+        # Per-mode average losses
+        mode_losses = {}
+        for mode in ('R', 'S', 'X'):
+            if self.running_mode_count[mode] > 0:
+                mode_losses[mode] = self.running_mode_loss[mode] / self.running_mode_count[mode]
 
         # Routing entropy for console
         entropy_stats = self.model.moe_manager.get_routing_entropy()
@@ -318,25 +368,32 @@ class Trainer:
         ul2_total = sum(self.running_ul2_modes.values())
         ul2_pcts = {k: v / max(ul2_total, 1) for k, v in self.running_ul2_modes.items()}
 
-        # Console
+        # Console — add normalized loss and per-mode losses
+        mode_str = ' '.join(f"{m}:{mode_losses[m]:.2f}" for m in ('R', 'S', 'X') if m in mode_losses)
         print(f"  step {self.global_step:>6d} | "
               f"loss {avg_loss:.4f} | "
+              f"norm {norm_loss:.2f} | "
               f"aux {avg_aux:.4f} | "
               f"lr {step_result['lr']:.2e} | "
               f"grad {step_result['grad_norm']:.2f} | "
               f"ent {mean_entropy:.3f} | "
-              f"R:{ul2_pcts['R']:.0%} S:{ul2_pcts['S']:.0%} X:{ul2_pcts['X']:.0%}")
+              f"{mode_str}")
 
         # wandb
         if self.use_wandb:
             log_dict = {
                 'loss': avg_loss,
+                'loss_normalized': norm_loss,
+                'expected_difficulty': difficulty,
                 'aux_loss': avg_aux,
                 'lr': step_result['lr'],
                 'grad_norm': step_result['grad_norm'],
                 'step': self.global_step,
                 'balance_alpha': self.model.moe_manager.get_ramped_alpha(self.global_step),
             }
+            # Per-mode losses
+            for mode, mloss in mode_losses.items():
+                log_dict[f'loss_mode/{mode}'] = mloss
             # Add per-layer routing entropy (Grok patch)
             entropy_stats = self.model.moe_manager.get_routing_entropy()
             log_dict.update(entropy_stats)
@@ -353,6 +410,8 @@ class Trainer:
         self.running_aux_loss = 0.0
         self.running_count = 0
         self.running_ul2_modes = {'R': 0, 'S': 0, 'X': 0}
+        self.running_mode_loss = {'R': 0.0, 'S': 0.0, 'X': 0.0}
+        self.running_mode_count = {'R': 0, 'S': 0, 'X': 0}
 
     def save_checkpoint(self, extra: dict = None):
         """Save model checkpoint. Also checks for routing collapse."""

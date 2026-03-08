@@ -202,15 +202,26 @@ class Router(nn.Module):
     v2: ReLU replaces softmax+top-k. Variable sparsity — a token can activate
     0, 1, or all experts. Gate outputs are ReLU'd then L1-normalized.
 
+    v2.3: Mode-conditioned routing — UL2 mode (R/S/X) provides a learned additive
+    bias on gate logits. This lets the router develop mode-dependent routing
+    preferences (e.g., prefer Type A for R-mode, avoid Type A for S-mode).
+
     The encoder_available signal is projected from a 1-bit scalar through a learned
     Linear(1, d_model//4) + LayerNorm. (Grok audit patch, 2026-03-04)
 
     Runs in float32 for numerical stability regardless of model dtype.
     """
 
+    # Mode ID constants (must match collator mapping)
+    MODE_R = 0
+    MODE_S = 1
+    MODE_X = 2
+    N_MODES = 3
+
     def __init__(self, config: ModelConfig):
         super().__init__()
         self.n_experts = config.n_experts
+        self.use_mode_conditioning = getattr(config, 'mode_conditioned_routing', False)
 
         # Learned encoder_available projection (Grok patch: upgrade from 1-bit)
         self.enc_signal_dim = max(config.d_model // 4, 1)
@@ -221,13 +232,22 @@ class Router(nn.Module):
         self.gate = nn.Linear(config.d_model + self.enc_signal_dim, config.n_experts, bias=True)
         nn.init.constant_(self.gate.bias, 0.1)
 
+        # Mode-conditioned gate bias (v2.3): learned per-mode bias on expert logits
+        # R=0, S=1, X=2 → n_experts logit bias per mode
+        # Initialized to zero (neutral). Total new params: 3 * n_experts = 6.
+        if self.use_mode_conditioning:
+            self.mode_gate_bias = nn.Embedding(self.N_MODES, config.n_experts)
+            nn.init.zeros_(self.mode_gate_bias.weight)
+
     def forward(self, hidden_states: torch.Tensor,
                 encoder_available: torch.Tensor,
-                jitter_noise: float = 0.0) -> tuple:
+                jitter_noise: float = 0.0,
+                mode_ids: torch.Tensor = None) -> tuple:
         """
         hidden_states: (n_tokens, d_model)
         encoder_available: (n_tokens, 1)
         jitter_noise: std of Gaussian noise added to gate logits during training
+        mode_ids: (n_tokens,) — UL2 mode IDs (R=0, S=1, X=2), optional
 
         Returns:
             gate_weights: (n_tokens, n_experts) — ReLU + L1-normalized weights
@@ -240,6 +260,10 @@ class Router(nn.Module):
         # Gate
         gate_input = torch.cat([hidden_states.float(), enc_signal], dim=-1)
         gate_logits = self.gate(gate_input)  # (n_tokens, n_experts)
+
+        # Mode-conditioned bias (v2.3)
+        if self.use_mode_conditioning and mode_ids is not None:
+            gate_logits = gate_logits + self.mode_gate_bias(mode_ids)
 
         # Jitter: add noise during training to prevent dead ReLU fixed points
         if self.training and jitter_noise > 0:
@@ -290,6 +314,9 @@ class MOEManager:
         # Accept any kwargs for backward compat (alpha_start, alpha_end, ramp_steps)
         self.z_losses = []
         self.liveness_losses = []
+        self.expert_aux_losses = []
+        self.similarity_losses = []  # v2.4: CKA expert similarity (SimSMoE)
+        self.rcl_losses = []         # v2.4: routing contrastive (ProMoE)
 
         # Routing entropy tracking
         self.layer_entropies = []
@@ -300,6 +327,9 @@ class MOEManager:
     def reset(self):
         self.z_losses = []
         self.liveness_losses = []
+        self.expert_aux_losses = []
+        self.similarity_losses = []
+        self.rcl_losses = []
         self.layer_entropies = []
         self.layer_expert_fracs = []
 
@@ -347,10 +377,68 @@ class MOEManager:
         z_loss = (log_z ** 2).mean()
         self.z_losses.append(z_loss)
 
+    def add_rcl_loss(self, gate_weights: torch.Tensor,
+                     hidden_states: torch.Tensor,
+                     prototypes: torch.Tensor,
+                     tau: float = 0.07):
+        """ProMoE-style routing contrastive loss.
+
+        Pulls each expert prototype toward the centroid of its assigned tokens,
+        pushes it away from other experts' centroids. InfoNCE formulation.
+
+        gate_weights: (n_tokens, n_experts) — post-ReLU, L1-normalized
+        hidden_states: (n_tokens, d_model) — token representations
+        prototypes: (n_experts, d_model) — learnable expert prototypes
+        tau: InfoNCE temperature
+        """
+        n_experts = gate_weights.shape[1]
+
+        # Find active experts (received at least 1 token)
+        active_mask = gate_weights > 0
+        expert_has_tokens = active_mask.any(dim=0)
+        active_ids = expert_has_tokens.nonzero(as_tuple=True)[0]
+
+        if len(active_ids) < 2:
+            return
+
+        # Compute weighted centroid for each active expert
+        centroids = []
+        active_protos = []
+        for eid in active_ids:
+            w = gate_weights[:, eid]
+            mask = w > 0
+            if mask.sum() == 0:
+                continue
+            tokens = hidden_states[mask]
+            weights = w[mask].unsqueeze(-1)
+            centroid = (weights * tokens).sum(dim=0) / weights.sum()
+            centroids.append(centroid)
+            active_protos.append(prototypes[eid])
+
+        if len(centroids) < 2:
+            return
+
+        centroids = torch.stack(centroids)
+        active_protos = torch.stack(active_protos)
+
+        # L2-normalize for cosine similarity
+        centroids = F.normalize(centroids, dim=-1)
+        active_protos = F.normalize(active_protos, dim=-1)
+
+        # InfoNCE: prototype i should match centroid i
+        sim = torch.mm(active_protos, centroids.t()) / tau
+        labels = torch.arange(len(centroids), device=sim.device)
+
+        rcl = F.cross_entropy(sim, labels)
+        self.rcl_losses.append(rcl)
+
     def get_aux_loss(self, global_step: int = 0,
                      z_weight: float = 0.0,
-                     liveness_weight: float = 0.0) -> torch.Tensor:
-        """Return z-loss + liveness loss."""
+                     liveness_weight: float = 0.0,
+                     expert_aux_weight: float = 0.0,
+                     similarity_weight: float = 0.0,
+                     rcl_weight: float = 0.0) -> torch.Tensor:
+        """Return combined auxiliary loss."""
         total = torch.tensor(0.0)
         if z_weight > 0 and self.z_losses:
             device = self.z_losses[0].device
@@ -360,6 +448,18 @@ class MOEManager:
             device = self.liveness_losses[0].device
             total = total.to(device)
             total = total + liveness_weight * sum(self.liveness_losses) / len(self.liveness_losses)
+        if expert_aux_weight > 0 and self.expert_aux_losses:
+            device = self.expert_aux_losses[0].device
+            total = total.to(device)
+            total = total + expert_aux_weight * sum(self.expert_aux_losses) / len(self.expert_aux_losses)
+        if similarity_weight > 0 and self.similarity_losses:
+            device = self.similarity_losses[0].device
+            total = total.to(device)
+            total = total + similarity_weight * sum(self.similarity_losses) / len(self.similarity_losses)
+        if rcl_weight > 0 and self.rcl_losses:
+            device = self.rcl_losses[0].device
+            total = total.to(device)
+            total = total + rcl_weight * sum(self.rcl_losses) / len(self.rcl_losses)
         return total
 
     def get_routing_entropy(self) -> dict:
