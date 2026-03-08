@@ -203,7 +203,7 @@ class ModelConfig:
 
 
 def TinyConfig(**overrides) -> ModelConfig:
-    """~13M params. Mac M-series trainable. v2: Hymba SSM+Attn, ReLU routing, shared expert."""
+    """~13M params. Mac M-series trainable. v2.4: all features enabled for restart."""
     defaults = dict(
         d_model=256,
         d_ff=512,             # routed expert FFN (2x d_model, was 1024)
@@ -224,6 +224,18 @@ def TinyConfig(**overrides) -> ModelConfig:
         router_jitter_noise=0.1,      # prevent dead ReLU in routing
         liveness_min_frac=0.05,       # 5% minimum expert activation
         liveness_loss_weight=0.1,     # liveness penalty weight
+        # v2.2: per-expert aux heads
+        expert_aux_heads=True,
+        expert_aux_weight=0.05,
+        # v2.3: mode-conditioned routing
+        mode_conditioned_routing=True,
+        hard_s_mode_gate=True,
+        # v2.4: expert diversity losses
+        similarity_loss_weight=0.1,   # SimSMoE CKA
+        similarity_threshold=0.5,
+        similarity_n_proj=16,
+        rcl_weight=0.5,               # ProMoE routing contrastive
+        rcl_tau=0.07,
     )
     defaults.update(overrides)
     return ModelConfig(**defaults)
